@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameTrade - 게임 재화 시세 조회</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    background: #0f1923;
+    color: #e0e6ed;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a2a3a 0%, #0d1b2a 100%);
+    border-bottom: 1px solid #1e3a5f;
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #4fc3f7;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: #ff8a65; }
+  .header-nav { display: flex; gap: 24px; }
+  .header-nav a {
+    color: #8899aa;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  .header-nav a:hover, .header-nav a.active { color: #4fc3f7; }
+
+  /* Notice Bar */
+  .notice-bar {
+    background: #1a2a3a;
+    border-bottom: 1px solid #1e3a5f;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #ffab40;
+  }
+
+  /* Main */
+  .main { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+
+  /* Game Tabs */
+  .game-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .game-tab {
+    background: #1a2a3a;
+    border: 1px solid #1e3a5f;
+    border-radius: 10px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 160px;
+  }
+  .game-tab:hover { border-color: #4fc3f7; }
+  .game-tab.active {
+    border-color: #4fc3f7;
+    background: linear-gradient(135deg, #1a3a5a 0%, #1a2a3a 100%);
+    box-shadow: 0 0 20px rgba(79, 195, 247, 0.1);
+  }
+  .game-tab .game-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .game-tab .game-info { display: flex; flex-direction: column; }
+  .game-tab .game-name { font-size: 15px; font-weight: 600; color: #e0e6ed; }
+  .game-tab .game-unit { font-size: 11px; color: #6688aa; margin-top: 2px; }
+
+  /* Section Title */
+  .section-title {
+    font-size: 14px;
+    color: #6688aa;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Price Cards */
+  .server-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .price-card {
+    background: #152232;
+    border: 1px solid #1e3a5f;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+  }
+  .price-card:hover {
+    border-color: #2a5a8f;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .server-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: #e0e6ed;
+  }
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .status-badge.available {
+    background: rgba(76, 175, 80, 0.15);
+    color: #66bb6a;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+  }
+  .status-badge.soldout {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ffa726;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+  }
+  .status-badge.no_buy {
+    background: rgba(244, 67, 54, 0.15);
+    color: #ef5350;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+  }
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a2a3a;
+  }
+  .price-row:last-of-type { border-bottom: none; }
+  .price-label {
+    font-size: 13px;
+    color: #6688aa;
+  }
+  .price-value {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .price-value.sell { color: #ef5350; }
+  .price-value.buy { color: #42a5f5; }
+  .price-unit {
+    font-size: 12px;
+    color: #6688aa;
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #1a2a3a;
+  }
+  .updated-time {
+    font-size: 11px;
+    color: #556677;
+  }
+  .card-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-sell {
+    background: linear-gradient(135deg, #42a5f5, #1e88e5);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-sell:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(66, 165, 245, 0.4);
+  }
+  .btn-buy {
+    background: linear-gradient(135deg, #ef5350, #c62828);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-buy:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+  }
+  .btn-sell:disabled, .btn-buy:disabled {
+    background: #2a3a4a;
+    color: #556677;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #152232;
+    border: 1px solid #1e3a5f;
+    border-radius: 16px;
+    padding: 32px;
+    width: 90%;
+    max-width: 440px;
+    position: relative;
+  }
+  .modal h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .modal h2.sell-title { color: #42a5f5; }
+  .modal h2.buy-title { color: #ef5350; }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    color: #6688aa;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    color: #6688aa;
+    margin-bottom: 6px;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    background: #0f1923;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    color: #e0e6ed;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: #4fc3f7; }
+  .form-group .readonly {
+    background: #1a2a3a;
+    color: #8899aa;
+  }
+  .estimate {
+    background: #1a2a3a;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .estimate-label { font-size: 12px; color: #6688aa; }
+  .estimate-value { font-size: 24px; font-weight: 700; color: #ffab40; margin-top: 4px; }
+  .btn-submit {
+    width: 100%;
+    padding: 12px;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-submit.sell-submit {
+    background: linear-gradient(135deg, #42a5f5, #1e88e5);
+  }
+  .btn-submit.sell-submit:hover { box-shadow: 0 4px 16px rgba(66, 165, 245, 0.4); }
+  .btn-submit.buy-submit {
+    background: linear-gradient(135deg, #ef5350, #c62828);
+  }
+  .btn-submit.buy-submit:hover { box-shadow: 0 4px 16px rgba(239, 83, 80, 0.4); }
+
+  /* All Prices Table */
+  .all-prices-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #152232;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .all-prices-table th {
+    background: #1a2a3a;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    color: #6688aa;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+  .all-prices-table th:hover { color: #4fc3f7; }
+  .all-prices-table th .sort-arrow {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 10px;
+    color: #3a4a5a;
+  }
+  .all-prices-table th.sort-asc .sort-arrow { color: #4fc3f7; }
+  .all-prices-table th.sort-desc .sort-arrow { color: #4fc3f7; }
+  .all-prices-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #1a2a3a;
+    font-size: 14px;
+  }
+  .all-prices-table tr:hover td { background: rgba(79, 195, 247, 0.03); }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid #1e3a5f;
+    padding: 30px 20px;
+    text-align: center;
+    color: #3a4a5a;
+    font-size: 12px;
+    margin-top: 40px;
+  }
+
+  /* Telegram toast */
+  .tg-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 360px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    z-index: 300;
+    overflow: hidden;
+    transform: translateY(120%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+  }
+  .tg-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .tg-header {
+    background: #0088cc;
+    color: #fff;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .tg-header-left { display: flex; align-items: center; gap: 8px; }
+  .tg-header .tg-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  .tg-body {
+    padding: 14px;
+    color: #202124;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .tg-bubble {
+    background: #e6f4ea;
+    border-radius: 0 12px 12px 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .tg-bubble strong { display: block; margin-bottom: 6px; font-size: 14px; }
+  .tg-bubble .tg-time { color: #80868b; font-size: 11px; }
+  .tg-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .tg-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .tg-btn:hover { opacity: 0.85; }
+  .tg-btn.done { background: #0f9d58; color: #fff; }
+  .tg-btn.cancel { background: #c5221f; color: #fff; }
+  .tg-result {
+    text-align: center;
+    padding: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+  }
+
+  /* Loading */
+  .loading-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #0f1923;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: opacity 0.3s;
+  }
+  .loading-overlay.hide { opacity: 0; pointer-events: none; }
+  .loading-spinner {
+    width: 40px; height: 40px;
+    border: 3px solid #1e3a5f;
+    border-top-color: #4fc3f7;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: #6688aa; font-size: 14px; margin-top: 14px; }
+  .time-hint {
+    font-size: 11px;
+    color: #556677;
+    margin-top: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .server-grid { grid-template-columns: 1fr; }
+    .game-tabs { gap: 8px; }
+    .game-tab { min-width: 140px; padding: 10px 16px; }
+    .game-tab .game-icon { width: 32px; height: 32px; font-size: 16px; }
+    .price-value { font-size: 18px; }
+    .card-buttons { flex-direction: column; gap: 6px; }
+    .tg-toast { width: calc(100% - 32px); right: 16px; bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">시세 데이터를 불러오는 중...</div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">Game<span>Trade</span></div>
+    <div class="header-nav">
+      <a href="#" class="active">시세 조회</a>
+      <a href="#all-prices">전체 시세표</a>
+      <a href="#">이용안내</a>
+    </div>
+  </div>
+</div>
+
+<!-- Notice -->
+<div class="notice-bar" id="noticeBar">
+  [공지] 데이터를 불러오는 중...
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Game Tabs (동적 생성) -->
+  <div class="section-title">게임 선택</div>
+  <div class="game-tabs" id="gameTabs"></div>
+
+  <!-- Server Price Cards -->
+  <div class="section-title" id="serverTitle">리니지 클래식 서버별 시세</div>
+  <div class="server-grid" id="serverGrid"></div>
+
+  <!-- All Prices (selected game only) -->
+  <div id="all-prices" style="margin-top: 20px;">
+    <div class="section-title" id="allPricesTitle">리니지 클래식 전체 시세표</div>
+    <div style="border-radius: 12px; overflow: hidden; border: 1px solid #1e3a5f;">
+      <table class="all-prices-table" id="allPricesTable">
+        <thead>
+          <tr>
+            <th data-col="name" data-type="string" onclick="sortTable('name')">서버 <span class="sort-arrow">&#9650;&#9660;</span></th>
+            <th data-col="sell" data-type="number" onclick="sortTable('sell')">살 때 <span class="sort-arrow">&#9650;&#9660;</span></th>
+            <th data-col="buy" data-type="number" onclick="sortTable('buy')">팔 때 <span class="sort-arrow">&#9650;&#9660;</span></th>
+            <th data-col="unit" data-type="string" onclick="sortTable('unit')">단위 <span class="sort-arrow">&#9650;&#9660;</span></th>
+            <th data-col="status" data-type="string" onclick="sortTable('status')">상태 <span class="sort-arrow">&#9650;&#9660;</span></th>
+            <th data-col="updated" data-type="string" onclick="sortTable('updated')">업데이트 <span class="sort-arrow">&#9650;&#9660;</span></th>
+          </tr>
+        </thead>
+        <tbody id="allPricesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Sell Modal -->
+<div class="modal-overlay" id="sellModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('sellModal')">&times;</button>
+    <h2 class="sell-title">판매신청</h2>
+    <div class="form-group">
+      <label>게임</label>
+      <input type="text" class="readonly" id="sellModalGame" readonly>
+    </div>
+    <div class="form-group">
+      <label>서버</label>
+      <input type="text" class="readonly" id="sellModalServer" readonly>
+    </div>
+    <div class="form-group">
+      <label>단가 (팔 때 받는 가격)</label>
+      <input type="text" class="readonly" id="sellModalPrice" readonly>
+    </div>
+    <div class="form-group">
+      <label>판매수량</label>
+      <input type="number" id="sellModalAmount" placeholder="예: 5" min="1" oninput="calcEstimate('sell')">
+    </div>
+    <div class="estimate">
+      <div class="estimate-label">예상 정산금액</div>
+      <div class="estimate-value" id="sellEstimateValue">0원</div>
+    </div>
+    <div class="form-group">
+      <label>캐릭터명</label>
+      <input type="text" id="sellModalChar" placeholder="게임 내 캐릭터명">
+    </div>
+    <div class="form-group">
+      <label>연락처</label>
+      <input type="text" id="sellModalContact" placeholder="010-0000-0000">
+    </div>
+    <div class="form-group">
+      <label>입금받을 계좌</label>
+      <div style="display:flex; gap:8px;">
+        <select id="sellModalBank" style="width:40%; background:#0f1923; border:1px solid #1e3a5f; border-radius:8px; color:#e0e6ed; padding:10px; font-size:14px; outline:none;">
+          <option value="">은행 선택</option>
+          <option>국민은행</option>
+          <option>신한은행</option>
+          <option>우리은행</option>
+          <option>하나은행</option>
+          <option>농협은행</option>
+          <option>기업은행</option>
+          <option>카카오뱅크</option>
+          <option>토스뱅크</option>
+          <option>케이뱅크</option>
+        </select>
+        <input type="text" id="sellModalAccount" placeholder="계좌번호 (- 없이)" style="flex:1;">
+      </div>
+    </div>
+    <button class="btn-submit sell-submit" onclick="submitForm('sell')">판매신청</button>
+  </div>
+</div>
+
+<!-- Buy Modal -->
+<div class="modal-overlay" id="buyModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('buyModal')">&times;</button>
+    <h2 class="buy-title">구매신청</h2>
+    <div class="form-group">
+      <label>게임</label>
+      <input type="text" class="readonly" id="buyModalGame" readonly>
+    </div>
+    <div class="form-group">
+      <label>서버</label>
+      <input type="text" class="readonly" id="buyModalServer" readonly>
+    </div>
+    <div class="form-group">
+      <label>단가 (살 때 가격)</label>
+      <input type="text" class="readonly" id="buyModalPrice" readonly>
+    </div>
+    <div class="form-group">
+      <label>구매수량</label>
+      <input type="number" id="buyModalAmount" placeholder="예: 5" min="1" oninput="calcEstimate('buy')">
+    </div>
+    <div class="estimate">
+      <div class="estimate-label">예상 결제금액</div>
+      <div class="estimate-value" id="buyEstimateValue">0원</div>
+    </div>
+    <div class="form-group">
+      <label>캐릭터명</label>
+      <input type="text" id="buyModalChar" placeholder="게임 내 캐릭터명">
+    </div>
+    <div class="form-group">
+      <label>연락처</label>
+      <input type="text" id="buyModalContact" placeholder="010-0000-0000">
+    </div>
+    <button class="btn-submit buy-submit" onclick="submitForm('buy')">구매신청</button>
+  </div>
+</div>
+
+<!-- Telegram Toast -->
+<div class="tg-toast" id="tgToast">
+  <div class="tg-header">
+    <div class="tg-header-left">
+      <span>&#9992;</span>
+      <span>GameTrade Bot</span>
+    </div>
+    <button class="tg-close" onclick="closeTgToast()">&times;</button>
+  </div>
+  <div class="tg-body">
+    <div class="tg-bubble">
+      <strong id="tgTitle"></strong>
+      <span id="tgContent"></span>
+      <div class="tg-time" id="tgTime"></div>
+    </div>
+    <div class="tg-buttons" id="tgButtons">
+      <button class="tg-btn done" onclick="handleTgBtn('done')">거래 완료</button>
+      <button class="tg-btn cancel" onclick="handleTgBtn('cancel')">취소</button>
+    </div>
+    <div class="tg-result" id="tgResult"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  &copy; 2026 GameTrade. 본 사이트는 포트폴리오 샘플입니다. | 문의: example@email.com
+</div>
+
+<script>
+// ===== 설정 =====
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4JLvHRzJ5SAul9FndY28k1n2ywki9qWuBC5C7WKR4gwtweygJqmEnELl4yeWA2l8y/exec';
+
+// ===== 게임 아이콘/색상 맵 (game_id별) =====
+var GAME_STYLE = {
+  LINC:    { icon: '&#9876;', gradient: 'linear-gradient(135deg, #8b5e3c, #5d3a1a)' },
+  AION2:   { icon: '&#10040;', gradient: 'linear-gradient(135deg, #3a7bd5, #1a3a6a)' },
+  LIN2:    { icon: '&#9733;', gradient: 'linear-gradient(135deg, #6a1b9a, #4a148c)' },
+  LOSTARK: { icon: '&#9830;', gradient: 'linear-gradient(135deg, #e65100, #bf360c)' }
+};
+var DEFAULT_STYLE = { icon: '&#9679;', gradient: 'linear-gradient(135deg, #455a64, #263238)' };
+
+// ===== 더미 데이터 (API 연결 전 폴백) =====
+// status: 'available' = 거래가능, 'soldout' = 품절(구매불가), 'no_buy' = 매입불가(관리자 설정, 판매신청 불가)
+var FALLBACK_DATA = {
+  linc: {
+    name: '리니지 클래식',
+    unit: '1억',
+    color: '#8b5e3c',
+    servers: [
+      { name: '바츠', sell: 35000, buy: 30000, status: 'available', updated: '2026-03-25 14:00' },
+      { name: '켄라우헬', sell: 38000, buy: 33000, status: 'available', updated: '2026-03-25 13:30' },
+      { name: '데포로쥬', sell: 32000, buy: 27000, status: 'available', updated: '2026-03-25 12:00' },
+      { name: '아인하사드', sell: 36000, buy: 31000, status: 'available', updated: '2026-03-25 14:00' },
+      { name: '지그하르트', sell: 34000, buy: 29000, status: 'soldout', updated: '2026-03-25 10:00' },
+      { name: '테온', sell: 33000, buy: 0, status: 'no_buy', updated: '2026-03-25 09:00' },
+    ]
+  },
+  aion2: {
+    name: '아이온2',
+    unit: '100만',
+    color: '#3a7bd5',
+    servers: [
+      { name: '이스라펠', sell: 12000, buy: 9500, status: 'available', updated: '2026-03-25 14:00' },
+      { name: '시엘', sell: 11000, buy: 8800, status: 'available', updated: '2026-03-25 13:00' },
+      { name: '지켈', sell: 13000, buy: 10500, status: 'available', updated: '2026-03-25 14:00' },
+      { name: '네자칸', sell: 10500, buy: 8500, status: 'soldout', updated: '2026-03-25 11:30' },
+    ]
+  },
+  lin2: {
+    name: '리니지2',
+    unit: '1억',
+    color: '#6a1b9a',
+    servers: [
+      { name: '아덴', sell: 8500, buy: 7000, status: 'available', updated: '2026-03-25 13:00' },
+      { name: '바이움', sell: 9000, buy: 7500, status: 'available', updated: '2026-03-25 13:00' },
+      { name: '오렌', sell: 7500, buy: 6000, status: 'no_buy', updated: '2026-03-24 18:00' },
+    ]
+  },
+  lost: {
+    name: '로스트아크',
+    unit: '1만골드',
+    color: '#e65100',
+    servers: [
+      { name: '카단', sell: 950, buy: 750, status: 'available', updated: '2026-03-25 14:00' },
+      { name: '카마인', sell: 900, buy: 700, status: 'available', updated: '2026-03-25 14:00' },
+      { name: '실리안', sell: 880, buy: 680, status: 'soldout', updated: '2026-03-25 12:00' },
+    ]
+  }
+};
+
+var FALLBACK_SETTINGS = {
+  trade_sell_start_time: '09:00',
+  trade_sell_end_time: '22:00',
+  trade_buy_start_time: '10:00',
+  trade_buy_end_time: '21:00',
+  site_notice: '점검시간: 매주 수요일 06:00~08:00',
+  min_amount: '1'
+};
+
+var DATA = {};
+var SETTINGS = {};
+var currentGame = '';
+var modalPrice = 0;
+var currentSort = { col: null, dir: null };
+
+// ============================================================
+// 데이터 로드
+// ============================================================
+
+function loadData() {
+  // JSONP 방식으로 Apps Script 호출 (CORS 우회)
+  window._onDataLoaded = function(result) {
+    if (result.games && Object.keys(result.games).length > 0) {
+      DATA = result.games;
+      SETTINGS = result.settings || FALLBACK_SETTINGS;
+    } else {
+      useFallback();
+    }
+    initPage();
+    delete window._onDataLoaded;
+  };
+  var script = document.createElement('script');
+  script.src = APPS_SCRIPT_URL + '?callback=_onDataLoaded';
+  script.onerror = function() {
+    useFallback();
+    initPage();
+  };
+  document.body.appendChild(script);
+}
+
+function useFallback() {
+  DATA = FALLBACK_DATA;
+  SETTINGS = FALLBACK_SETTINGS;
+}
+
+function initPage() {
+  document.getElementById('loadingOverlay').classList.add('hide');
+  updateNotice();
+  renderGameTabs();
+  renderServers();
+  renderAllPrices();
+}
+
+// ============================================================
+// 공지 & 게임 탭 동적 생성
+// ============================================================
+
+function updateNotice() {
+  var sellH = (SETTINGS.trade_sell_start_time || '09:00') + '~' + (SETTINGS.trade_sell_end_time || '22:00');
+  var buyH = (SETTINGS.trade_buy_start_time || '10:00') + '~' + (SETTINGS.trade_buy_end_time || '21:00');
+  var notice = SETTINGS.site_notice || '';
+  document.getElementById('noticeBar').innerHTML =
+    '[공지] 재화 팔기: ' + sellH + ' | 재화 사기: ' + buyH + (notice ? ' | ' + notice : '');
+}
+
+function renderGameTabs() {
+  var container = document.getElementById('gameTabs');
+  var gameIds = Object.keys(DATA).sort(function(a, b) {
+    return (DATA[a].sort_order || 0) - (DATA[b].sort_order || 0);
+  });
+  if (gameIds.length === 0) return;
+  if (!currentGame || !DATA[currentGame]) currentGame = gameIds[0];
+
+  container.innerHTML = gameIds.map(function(id) {
+    var g = DATA[id];
+    var style = GAME_STYLE[id] || DEFAULT_STYLE;
+    var active = id === currentGame ? ' active' : '';
+    return '<div class="game-tab' + active + '" data-game="' + id + '" onclick="selectGame(\'' + id + '\')">' +
+      '<div class="game-icon" style="background:' + style.gradient + ';">' + style.icon + '</div>' +
+      '<div class="game-info">' +
+        '<div class="game-name">' + g.name + '</div>' +
+        '<div class="game-unit">거래단위: ' + g.unit + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+// ============================================================
+// 운영시간 체크
+// ============================================================
+
+function isOperatingHours(type) {
+  var now = new Date();
+  var cur = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  var start = SETTINGS['trade_' + type + '_start_time'] || '00:00';
+  var end = SETTINGS['trade_' + type + '_end_time'] || '23:59';
+  return cur >= start && cur <= end;
+}
+
+function getHoursText(type) {
+  return (SETTINGS['trade_' + type + '_start_time'] || '00:00') + '~' + (SETTINGS['trade_' + type + '_end_time'] || '23:59');
+}
+
+// ============================================================
+// 게임 선택 =====
+function selectGame(gameId) {
+  currentGame = gameId;
+  currentSort = { col: null, dir: null };
+  document.querySelectorAll('.game-tab').forEach(function(t) { t.classList.remove('active'); });
+  var tab = document.querySelector('.game-tab[data-game="' + gameId + '"]');
+  if (tab) tab.classList.add('active');
+  renderServers();
+  renderAllPrices();
+}
+
+// ===== 서버 카드 렌더링 =====
+function renderServers() {
+  var game = DATA[currentGame];
+  if (!game) return;
+  document.getElementById('serverTitle').textContent = game.name + ' 서버별 시세';
+  var grid = document.getElementById('serverGrid');
+  var sellOpen = isOperatingHours('sell');
+  var buyOpen = isOperatingHours('buy');
+
+  grid.innerHTML = game.servers.map(function(s) {
+    var statusText = s.status === 'available' ? '거래가능' : s.status === 'soldout' ? '품절' : '매입불가';
+    var sellDisabled = (s.status === 'no_buy' || !sellOpen) ? 'disabled' : '';
+    var buyDisabled = (s.status === 'soldout' || !buyOpen) ? 'disabled' : '';
+    var buyPriceDisplay = s.status === 'no_buy' ? '-' : s.buy.toLocaleString() + '원';
+    var sellHint = !sellOpen ? '<div class="time-hint">' + getHoursText('sell') + ' 가능</div>' : '';
+    var buyHint = !buyOpen ? '<div class="time-hint">' + getHoursText('buy') + ' 가능</div>' : '';
+
+    return '<div class="price-card">' +
+      '<div class="card-header">' +
+        '<div class="server-name">' + s.name + '</div>' +
+        '<span class="status-badge ' + s.status + '">' + statusText + '</span>' +
+      '</div>' +
+      '<div class="price-row">' +
+        '<span class="price-label">살 때 가격</span>' +
+        '<span class="price-value sell">' + s.sell.toLocaleString() + '원<span class="price-unit">/ ' + game.unit + '</span></span>' +
+      '</div>' +
+      '<div class="price-row">' +
+        '<span class="price-label">팔 때 받는 가격</span>' +
+        '<span class="price-value buy">' + buyPriceDisplay + (s.status !== 'no_buy' ? '<span class="price-unit">/ ' + game.unit + '</span>' : '') + '</span>' +
+      '</div>' +
+      '<div class="card-footer">' +
+        '<span class="updated-time">' + s.updated + '</span>' +
+        '<div class="card-buttons">' +
+          '<div style="text-align:center"><button class="btn-sell" ' + sellDisabled + ' onclick="openSellModal(\'' + game.name + '\',\'' + s.name + '\',' + s.buy + ',\'' + game.unit + '\')">판매신청</button>' + sellHint + '</div>' +
+          '<div style="text-align:center"><button class="btn-buy" ' + buyDisabled + ' onclick="openBuyModal(\'' + game.name + '\',\'' + s.name + '\',' + s.sell + ',\'' + game.unit + '\')">구매신청</button>' + buyHint + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ===== 전체 시세표 (선택된 게임만) =====
+function renderAllPrices() {
+  var game = DATA[currentGame];
+  if (!game) return;
+  document.getElementById('allPricesTitle').textContent = game.name + ' 전체 시세표';
+
+  var servers = game.servers.slice();
+
+  // 정렬 적용
+  if (currentSort.col) {
+    servers.sort(function(a, b) {
+      var va, vb;
+      switch (currentSort.col) {
+        case 'name': va = a.name; vb = b.name; break;
+        case 'sell': va = a.sell; vb = b.sell; break;
+        case 'buy': va = a.buy; vb = b.buy; break;
+        case 'unit': va = game.unit; vb = game.unit; break;
+        case 'status':
+          var order = { available: 0, soldout: 1, no_buy: 2 };
+          va = order[a.status]; vb = order[b.status]; break;
+        case 'updated': va = a.updated; vb = b.updated; break;
+        default: va = ''; vb = '';
+      }
+      if (typeof va === 'string') {
+        var cmp = va.localeCompare(vb, 'ko');
+        return currentSort.dir === 'asc' ? cmp : -cmp;
+      } else {
+        return currentSort.dir === 'asc' ? va - vb : vb - va;
+      }
+    });
+  }
+
+  // 헤더 정렬 표시 업데이트
+  document.querySelectorAll('.all-prices-table th').forEach(function(th) {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === currentSort.col) {
+      th.classList.add(currentSort.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+
+  var tbody = document.getElementById('allPricesBody');
+  var html = '';
+  servers.forEach(function(s) {
+    var statusText = s.status === 'available' ? '거래가능' : s.status === 'soldout' ? '품절' : '매입불가';
+    var buyDisplay = s.status === 'no_buy' ? '-' : s.buy.toLocaleString() + '원';
+    html += '<tr>' +
+      '<td>' + s.name + '</td>' +
+      '<td style="color:#ef5350;font-weight:600">' + s.sell.toLocaleString() + '원</td>' +
+      '<td style="color:#42a5f5;font-weight:600">' + buyDisplay + '</td>' +
+      '<td style="color:#6688aa">' + game.unit + '</td>' +
+      '<td><span class="status-badge ' + s.status + '">' + statusText + '</span></td>' +
+      '<td style="color:#556677;font-size:12px">' + s.updated + '</td>' +
+    '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+// ===== 정렬 =====
+function sortTable(col) {
+  if (currentSort.col === col) {
+    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSort.col = col;
+    currentSort.dir = 'asc';
+  }
+  renderAllPrices();
+}
+
+// ===== 판매신청 모달 =====
+function openSellModal(gameName, serverName, buyPrice, unit) {
+  if (!isOperatingHours('sell')) {
+    alert('현재 판매신청 가능 시간이 아닙니다.\n운영시간: ' + getHoursText('sell'));
+    return;
+  }
+  modalPrice = buyPrice;
+  document.getElementById('sellModalGame').value = gameName;
+  document.getElementById('sellModalServer').value = serverName;
+  document.getElementById('sellModalPrice').value = buyPrice.toLocaleString() + '원 / ' + unit;
+  document.getElementById('sellModalAmount').value = '';
+  document.getElementById('sellEstimateValue').textContent = '0원';
+  document.getElementById('sellModalChar').value = '';
+  document.getElementById('sellModalContact').value = '';
+  document.getElementById('sellModalBank').value = '';
+  document.getElementById('sellModalAccount').value = '';
+  document.getElementById('sellModal').classList.add('show');
+}
+
+// ===== 구매신청 모달 =====
+function openBuyModal(gameName, serverName, sellPrice, unit) {
+  if (!isOperatingHours('buy')) {
+    alert('현재 구매신청 가능 시간이 아닙니다.\n운영시간: ' + getHoursText('buy'));
+    return;
+  }
+  modalPrice = sellPrice;
+  document.getElementById('buyModalGame').value = gameName;
+  document.getElementById('buyModalServer').value = serverName;
+  document.getElementById('buyModalPrice').value = sellPrice.toLocaleString() + '원 / ' + unit;
+  document.getElementById('buyModalAmount').value = '';
+  document.getElementById('buyEstimateValue').textContent = '0원';
+  document.getElementById('buyModalChar').value = '';
+  document.getElementById('buyModalContact').value = '';
+  document.getElementById('buyModal').classList.add('show');
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('show');
+}
+
+function calcEstimate(type) {
+  var amountEl = document.getElementById(type + 'ModalAmount');
+  var estimateEl = document.getElementById(type + 'EstimateValue');
+  var amount = parseInt(amountEl.value) || 0;
+  var total = amount * modalPrice;
+  estimateEl.textContent = total.toLocaleString() + '원';
+}
+
+function submitForm(type) {
+  var prefix = type + 'Modal';
+  var char = document.getElementById(prefix + 'Char').value;
+  var contact = document.getElementById(prefix + 'Contact').value;
+  var amount = document.getElementById(prefix + 'Amount').value;
+  var isSell = type === 'sell';
+
+  // 판매신청 시 계좌 검증
+  var bank = '', account = '';
+  if (isSell) {
+    bank = document.getElementById('sellModalBank').value;
+    account = document.getElementById('sellModalAccount').value;
+    if (!char || !contact || !amount || !bank || !account) {
+      alert('모든 항목을 입력해주세요.');
+      return;
+    }
+  } else {
+    if (!char || !contact || !amount) {
+      alert('모든 항목을 입력해주세요.');
+      return;
+    }
+  }
+
+  // 운영시간 재확인
+  if (!isOperatingHours(isSell ? 'sell' : 'buy')) {
+    alert('현재 ' + (isSell ? '판매' : '구매') + '신청 가능 시간이 아닙니다.');
+    return;
+  }
+
+  var gameName = document.getElementById(prefix + 'Game').value;
+  var serverName = document.getElementById(prefix + 'Server').value;
+  var priceInfo = document.getElementById(prefix + 'Price').value;
+  var total = (parseInt(amount) || 0) * modalPrice;
+  var label = isSell ? '판매' : '구매';
+  var emoji = isSell ? '📢' : '🛒';
+
+  var msgLines = '게임: ' + gameName + '\n' +
+    '서버: ' + serverName + '\n' +
+    label + '수량: ' + amount + '\n' +
+    (isSell ? '매입단가: ' : '판매단가: ') + priceInfo + '\n' +
+    (isSell ? '정산금액: ' : '결제금액: ') + total.toLocaleString() + '원\n\n' +
+    '캐릭터명: ' + char + '\n' +
+    '연락처: ' + contact;
+
+  if (isSell) {
+    msgLines += '\n입금계좌: ' + bank + ' ' + account;
+  }
+
+  // 현재 게임의 단위 가져오기
+  var gameData = DATA[currentGame] || {};
+  var unit = gameData.unit || '';
+
+  // API 전송 payload
+  var payload = {
+    action: 'submit',
+    type: label,
+    game_name: gameName,
+    server_name: serverName,
+    amount: parseInt(amount) || 0,
+    unit: unit,
+    unit_price: modalPrice,
+    total_price: total,
+    character_name: char,
+    contact: contact,
+    bank_account: isSell ? (bank + ' ' + account) : ''
+  };
+
+  closeModal(type + 'Modal');
+  showTgToast(emoji + ' ' + label + '신청 접수', msgLines);
+
+  // 백그라운드 API 전송 (미연결 시 무시)
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  }).catch(function() {});
+}
+
+// ===== 텔레그램 토스트 =====
+function showTgToast(title, content) {
+  var now = new Date();
+  var timeStr = now.getFullYear() + '-' +
+    String(now.getMonth()+1).padStart(2,'0') + '-' +
+    String(now.getDate()).padStart(2,'0') + ' ' +
+    String(now.getHours()).padStart(2,'0') + ':' +
+    String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('tgTitle').textContent = title;
+  document.getElementById('tgContent').innerHTML = content.replace(/\n/g, '<br>');
+  document.getElementById('tgTime').textContent = timeStr;
+  document.getElementById('tgButtons').style.display = 'flex';
+  document.getElementById('tgResult').style.display = 'none';
+  document.getElementById('tgToast').classList.add('show');
+}
+
+function closeTgToast() {
+  document.getElementById('tgToast').classList.remove('show');
+}
+
+function handleTgBtn(action) {
+  var resultEl = document.getElementById('tgResult');
+  var buttonsEl = document.getElementById('tgButtons');
+  buttonsEl.style.display = 'none';
+  resultEl.style.display = 'block';
+  if (action === 'done') {
+    resultEl.innerHTML = '&#10003; 완료 처리됨';
+    resultEl.style.color = '#0f9d58';
+  } else {
+    resultEl.innerHTML = '&#10007; 취소 처리됨';
+    resultEl.style.color = '#c5221f';
+  }
+  setTimeout(function() { closeTgToast(); }, 2500);
+}
+
+// 모달 바깥 클릭 시 닫기
+document.getElementById('sellModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('sellModal');
+});
+document.getElementById('buyModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('buyModal');
+});
+
+// 초기화 - API 로드 시도, 실패 시 폴백 데이터 사용
+loadData();
+</script>
+</body>
+</html>
