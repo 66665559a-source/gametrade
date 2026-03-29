@@ -744,24 +744,23 @@ var currentSort = { col: null, dir: null };
 // ============================================================
 
 function loadData() {
-  // JSONP 방식으로 Apps Script 호출 (CORS 우회)
-  window._onDataLoaded = function(result) {
-    if (result.games && Object.keys(result.games).length > 0) {
-      DATA = result.games;
-      SETTINGS = result.settings || FALLBACK_SETTINGS;
-    } else {
+  fetch(APPS_SCRIPT_URL)
+    .then(function(res) { return res.text(); })
+    .then(function(text) {
+      var result = JSON.parse(text);
+      if (result.games && Object.keys(result.games).length > 0) {
+        DATA = result.games;
+        SETTINGS = result.settings || FALLBACK_SETTINGS;
+      } else {
+        useFallback();
+      }
+      initPage();
+    })
+    .catch(function(err) {
+      console.error('API 로드 실패:', err);
       useFallback();
-    }
-    initPage();
-    delete window._onDataLoaded;
-  };
-  var script = document.createElement('script');
-  script.src = APPS_SCRIPT_URL + '?callback=_onDataLoaded';
-  script.onerror = function() {
-    useFallback();
-    initPage();
-  };
-  document.body.appendChild(script);
+      initPage();
+    });
 }
 
 function useFallback() {
