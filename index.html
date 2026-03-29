@@ -366,84 +366,28 @@
     margin-top: 40px;
   }
 
-  /* Telegram toast */
-  .tg-toast {
+  /* 신청 완료 토스트 */
+  .submit-toast {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 360px;
-    background: #fff;
-    border-radius: 14px;
+    background: #1a3a5a;
+    color: #4fc3f7;
+    border: 1px solid #2a5a8f;
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-size: 15px;
+    font-weight: 600;
     box-shadow: 0 8px 32px rgba(0,0,0,0.35);
     z-index: 300;
-    overflow: hidden;
     transform: translateY(120%);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
   }
-  .tg-toast.show {
+  .submit-toast.show {
     transform: translateY(0);
     opacity: 1;
   }
-  .tg-header {
-    background: #0088cc;
-    color: #fff;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 13px;
-    font-weight: 600;
-  }
-  .tg-header-left { display: flex; align-items: center; gap: 8px; }
-  .tg-header .tg-close {
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.7);
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0 4px;
-  }
-  .tg-body {
-    padding: 14px;
-    color: #202124;
-    font-size: 13px;
-    line-height: 1.7;
-  }
-  .tg-bubble {
-    background: #e6f4ea;
-    border-radius: 0 12px 12px 12px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-  }
-  .tg-bubble strong { display: block; margin-bottom: 6px; font-size: 14px; }
-  .tg-bubble .tg-time { color: #80868b; font-size: 11px; }
-  .tg-buttons {
-    display: flex;
-    gap: 8px;
-  }
-  .tg-btn {
-    flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .tg-btn:hover { opacity: 0.85; }
-  .tg-btn.done { background: #0f9d58; color: #fff; }
-  .tg-btn.cancel { background: #c5221f; color: #fff; }
-  .tg-result {
-    text-align: center;
-    padding: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    display: none;
-  }
-
   /* Loading */
   .loading-overlay {
     position: fixed;
@@ -480,7 +424,7 @@
     .game-tab .game-icon { width: 32px; height: 32px; font-size: 16px; }
     .price-value { font-size: 18px; }
     .card-buttons { flex-direction: column; gap: 6px; }
-    .tg-toast { width: calc(100% - 32px); right: 16px; bottom: 16px; }
+    .submit-toast { right: 16px; bottom: 16px; }
   }
 </style>
 </head>
@@ -530,6 +474,7 @@
             <th data-col="name" data-type="string" onclick="sortTable('name')">서버 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="sell" data-type="number" onclick="sortTable('sell')">살 때 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="buy" data-type="number" onclick="sortTable('buy')">팔 때 <span class="sort-arrow">&#9650;&#9660;</span></th>
+            <th data-col="stock" data-type="number" onclick="sortTable('stock')">재고 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="unit" data-type="string" onclick="sortTable('unit')">단위 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="status" data-type="string" onclick="sortTable('status')">상태 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="updated" data-type="string" onclick="sortTable('updated')">업데이트 <span class="sort-arrow">&#9650;&#9660;</span></th>
@@ -634,28 +579,8 @@
   </div>
 </div>
 
-<!-- Telegram Toast -->
-<div class="tg-toast" id="tgToast">
-  <div class="tg-header">
-    <div class="tg-header-left">
-      <span>&#9992;</span>
-      <span>GameTrade Bot</span>
-    </div>
-    <button class="tg-close" onclick="closeTgToast()">&times;</button>
-  </div>
-  <div class="tg-body">
-    <div class="tg-bubble">
-      <strong id="tgTitle"></strong>
-      <span id="tgContent"></span>
-      <div class="tg-time" id="tgTime"></div>
-    </div>
-    <div class="tg-buttons" id="tgButtons">
-      <button class="tg-btn done" onclick="handleTgBtn('done')">거래 완료</button>
-      <button class="tg-btn cancel" onclick="handleTgBtn('cancel')">취소</button>
-    </div>
-    <div class="tg-result" id="tgResult"></div>
-  </div>
-</div>
+<!-- 신청 완료 토스트 -->
+<div class="submit-toast" id="submitToast">신청이 접수되었습니다.</div>
 
 <!-- Footer -->
 <div class="footer">
@@ -683,12 +608,12 @@ var FALLBACK_DATA = {
     unit: '1억',
     color: '#8b5e3c',
     servers: [
-      { name: '바츠', sell: 35000, buy: 30000, status: 'available', updated: '2026-03-25 14:00' },
-      { name: '켄라우헬', sell: 38000, buy: 33000, status: 'available', updated: '2026-03-25 13:30' },
-      { name: '데포로쥬', sell: 32000, buy: 27000, status: 'available', updated: '2026-03-25 12:00' },
-      { name: '아인하사드', sell: 36000, buy: 31000, status: 'available', updated: '2026-03-25 14:00' },
-      { name: '지그하르트', sell: 34000, buy: 29000, status: 'soldout', updated: '2026-03-25 10:00' },
-      { name: '테온', sell: 33000, buy: 0, status: 'no_buy', updated: '2026-03-25 09:00' },
+      { name: '바츠', sell: 35000, buy: 30000, status: 'available', stock: 50, updated: '2026-03-25 14:00' },
+      { name: '켄라우헬', sell: 38000, buy: 33000, status: 'available', stock: 30, updated: '2026-03-25 13:30' },
+      { name: '데포로쥬', sell: 32000, buy: 27000, status: 'available', stock: 20, updated: '2026-03-25 12:00' },
+      { name: '아인하사드', sell: 36000, buy: 31000, status: 'available', stock: 45, updated: '2026-03-25 14:00' },
+      { name: '지그하르트', sell: 34000, buy: 29000, status: 'soldout', stock: 0, updated: '2026-03-25 10:00' },
+      { name: '테온', sell: 33000, buy: 0, status: 'no_buy', stock: 10, updated: '2026-03-25 09:00' },
     ]
   },
   aion2: {
@@ -696,10 +621,10 @@ var FALLBACK_DATA = {
     unit: '100만',
     color: '#3a7bd5',
     servers: [
-      { name: '이스라펠', sell: 12000, buy: 9500, status: 'available', updated: '2026-03-25 14:00' },
-      { name: '시엘', sell: 11000, buy: 8800, status: 'available', updated: '2026-03-25 13:00' },
-      { name: '지켈', sell: 13000, buy: 10500, status: 'available', updated: '2026-03-25 14:00' },
-      { name: '네자칸', sell: 10500, buy: 8500, status: 'soldout', updated: '2026-03-25 11:30' },
+      { name: '이스라펠', sell: 12000, buy: 9500, status: 'available', stock: 100, updated: '2026-03-25 14:00' },
+      { name: '시엘', sell: 11000, buy: 8800, status: 'available', stock: 80, updated: '2026-03-25 13:00' },
+      { name: '지켈', sell: 13000, buy: 10500, status: 'available', stock: 60, updated: '2026-03-25 14:00' },
+      { name: '네자칸', sell: 10500, buy: 8500, status: 'soldout', stock: 0, updated: '2026-03-25 11:30' },
     ]
   },
   lin2: {
@@ -707,9 +632,9 @@ var FALLBACK_DATA = {
     unit: '1억',
     color: '#6a1b9a',
     servers: [
-      { name: '아덴', sell: 8500, buy: 7000, status: 'available', updated: '2026-03-25 13:00' },
-      { name: '바이움', sell: 9000, buy: 7500, status: 'available', updated: '2026-03-25 13:00' },
-      { name: '오렌', sell: 7500, buy: 6000, status: 'no_buy', updated: '2026-03-24 18:00' },
+      { name: '아덴', sell: 8500, buy: 7000, status: 'available', stock: 35, updated: '2026-03-25 13:00' },
+      { name: '바이움', sell: 9000, buy: 7500, status: 'available', stock: 25, updated: '2026-03-25 13:00' },
+      { name: '오렌', sell: 7500, buy: 6000, status: 'no_buy', stock: 15, updated: '2026-03-24 18:00' },
     ]
   },
   lost: {
@@ -717,9 +642,9 @@ var FALLBACK_DATA = {
     unit: '1만골드',
     color: '#e65100',
     servers: [
-      { name: '카단', sell: 950, buy: 750, status: 'available', updated: '2026-03-25 14:00' },
-      { name: '카마인', sell: 900, buy: 700, status: 'available', updated: '2026-03-25 14:00' },
-      { name: '실리안', sell: 880, buy: 680, status: 'soldout', updated: '2026-03-25 12:00' },
+      { name: '카단', sell: 950, buy: 750, status: 'available', stock: 200, updated: '2026-03-25 14:00' },
+      { name: '카마인', sell: 900, buy: 700, status: 'available', stock: 150, updated: '2026-03-25 14:00' },
+      { name: '실리안', sell: 880, buy: 680, status: 'soldout', stock: 0, updated: '2026-03-25 12:00' },
     ]
   }
 };
@@ -850,7 +775,7 @@ function renderServers() {
   grid.innerHTML = game.servers.map(function(s) {
     var statusText = s.status === 'available' ? '거래가능' : s.status === 'soldout' ? '품절' : '매입불가';
     var sellDisabled = (s.status === 'no_buy' || !sellOpen) ? 'disabled' : '';
-    var buyDisabled = (s.status === 'soldout' || !buyOpen) ? 'disabled' : '';
+    var buyDisabled = (s.status === 'soldout' || s.stock <= 0 || !buyOpen) ? 'disabled' : '';
     var buyPriceDisplay = s.status === 'no_buy' ? '-' : s.buy.toLocaleString() + '원';
     var sellHint = !sellOpen ? '<div class="time-hint">' + getHoursText('sell') + ' 가능</div>' : '';
     var buyHint = !buyOpen ? '<div class="time-hint">' + getHoursText('buy') + ' 가능</div>' : '';
@@ -868,11 +793,15 @@ function renderServers() {
         '<span class="price-label">팔 때 받는 가격</span>' +
         '<span class="price-value buy">' + buyPriceDisplay + (s.status !== 'no_buy' ? '<span class="price-unit">/ ' + game.unit + '</span>' : '') + '</span>' +
       '</div>' +
+      '<div class="price-row">' +
+        '<span class="price-label">재고</span>' +
+        '<span class="price-value" style="color:#ffab40;font-size:16px">' + s.stock + '<span class="price-unit"> ' + game.unit + '</span></span>' +
+      '</div>' +
       '<div class="card-footer">' +
         '<span class="updated-time">' + s.updated + '</span>' +
         '<div class="card-buttons">' +
           '<div style="text-align:center"><button class="btn-sell" ' + sellDisabled + ' onclick="openSellModal(\'' + game.name + '\',\'' + s.name + '\',' + s.buy + ',\'' + game.unit + '\')">판매신청</button>' + sellHint + '</div>' +
-          '<div style="text-align:center"><button class="btn-buy" ' + buyDisabled + ' onclick="openBuyModal(\'' + game.name + '\',\'' + s.name + '\',' + s.sell + ',\'' + game.unit + '\')">구매신청</button>' + buyHint + '</div>' +
+          '<div style="text-align:center"><button class="btn-buy" ' + buyDisabled + ' onclick="openBuyModal(\'' + game.name + '\',\'' + s.name + '\',' + s.sell + ',\'' + game.unit + '\',' + s.stock + ')">구매신청</button>' + buyHint + '</div>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -895,6 +824,7 @@ function renderAllPrices() {
         case 'name': va = a.name; vb = b.name; break;
         case 'sell': va = a.sell; vb = b.sell; break;
         case 'buy': va = a.buy; vb = b.buy; break;
+        case 'stock': va = a.stock; vb = b.stock; break;
         case 'unit': va = game.unit; vb = game.unit; break;
         case 'status':
           var order = { available: 0, soldout: 1, no_buy: 2 };
@@ -928,6 +858,7 @@ function renderAllPrices() {
       '<td>' + s.name + '</td>' +
       '<td style="color:#ef5350;font-weight:600">' + s.sell.toLocaleString() + '원</td>' +
       '<td style="color:#42a5f5;font-weight:600">' + buyDisplay + '</td>' +
+      '<td style="color:#ffab40;font-weight:600">' + s.stock + '</td>' +
       '<td style="color:#6688aa">' + game.unit + '</td>' +
       '<td><span class="status-badge ' + s.status + '">' + statusText + '</span></td>' +
       '<td style="color:#556677;font-size:12px">' + s.updated + '</td>' +
@@ -967,7 +898,7 @@ function openSellModal(gameName, serverName, buyPrice, unit) {
 }
 
 // ===== 구매신청 모달 =====
-function openBuyModal(gameName, serverName, sellPrice, unit) {
+function openBuyModal(gameName, serverName, sellPrice, unit, stock) {
   if (!isOperatingHours('buy')) {
     alert('현재 구매신청 가능 시간이 아닙니다.\n운영시간: ' + getHoursText('buy'));
     return;
@@ -1047,12 +978,25 @@ function submitForm(type) {
   var gameData = DATA[currentGame] || {};
   var unit = gameData.unit || '';
 
+  // server_id 찾기
+  var serverId = '';
+  if (DATA[currentGame]) {
+    var servers = DATA[currentGame].servers;
+    for (var i = 0; i < servers.length; i++) {
+      if (servers[i].name === serverName) {
+        serverId = servers[i].server_id || '';
+        break;
+      }
+    }
+  }
+
   // API 전송 payload
   var payload = {
     action: 'submit',
     type: label,
     game_name: gameName,
     server_name: serverName,
+    server_id: serverId,
     amount: parseInt(amount) || 0,
     unit: unit,
     unit_price: modalPrice,
@@ -1063,7 +1007,7 @@ function submitForm(type) {
   };
 
   closeModal(type + 'Modal');
-  showTgToast(emoji + ' ' + label + '신청 접수', msgLines);
+  showSubmitToast(label + '신청이 접수되었습니다.');
 
   // 백그라운드 API 전송 (미연결 시 무시)
   fetch(APPS_SCRIPT_URL, {
@@ -1074,39 +1018,12 @@ function submitForm(type) {
   }).catch(function() {});
 }
 
-// ===== 텔레그램 토스트 =====
-function showTgToast(title, content) {
-  var now = new Date();
-  var timeStr = now.getFullYear() + '-' +
-    String(now.getMonth()+1).padStart(2,'0') + '-' +
-    String(now.getDate()).padStart(2,'0') + ' ' +
-    String(now.getHours()).padStart(2,'0') + ':' +
-    String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('tgTitle').textContent = title;
-  document.getElementById('tgContent').innerHTML = content.replace(/\n/g, '<br>');
-  document.getElementById('tgTime').textContent = timeStr;
-  document.getElementById('tgButtons').style.display = 'flex';
-  document.getElementById('tgResult').style.display = 'none';
-  document.getElementById('tgToast').classList.add('show');
-}
-
-function closeTgToast() {
-  document.getElementById('tgToast').classList.remove('show');
-}
-
-function handleTgBtn(action) {
-  var resultEl = document.getElementById('tgResult');
-  var buttonsEl = document.getElementById('tgButtons');
-  buttonsEl.style.display = 'none';
-  resultEl.style.display = 'block';
-  if (action === 'done') {
-    resultEl.innerHTML = '&#10003; 완료 처리됨';
-    resultEl.style.color = '#0f9d58';
-  } else {
-    resultEl.innerHTML = '&#10007; 취소 처리됨';
-    resultEl.style.color = '#c5221f';
-  }
-  setTimeout(function() { closeTgToast(); }, 2500);
+// ===== 신청 완료 토스트 =====
+function showSubmitToast(message) {
+  var toast = document.getElementById('submitToast');
+  toast.textContent = message || '신청이 접수되었습니다.';
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 
 // 모달 바깥 클릭 시 닫기
