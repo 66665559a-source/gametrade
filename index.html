@@ -795,7 +795,7 @@ function renderServers() {
       '</div>' +
       '<div class="price-row">' +
         '<span class="price-label">재고</span>' +
-        '<span class="price-value" style="color:#ffab40;font-size:16px">' + s.stock + '<span class="price-unit"> ' + game.unit + '</span></span>' +
+        '<span class="price-value" style="color:#ffab40;font-size:16px">' + s.stock.toLocaleString() + '<span class="price-unit"> ' + game.unit + '</span></span>' +
       '</div>' +
       '<div class="card-footer">' +
         '<span class="updated-time">' + s.updated + '</span>' +
@@ -858,7 +858,7 @@ function renderAllPrices() {
       '<td>' + s.name + '</td>' +
       '<td style="color:#ef5350;font-weight:600">' + s.sell.toLocaleString() + '원</td>' +
       '<td style="color:#42a5f5;font-weight:600">' + buyDisplay + '</td>' +
-      '<td style="color:#ffab40;font-weight:600">' + s.stock + '</td>' +
+      '<td style="color:#ffab40;font-weight:600">' + s.stock.toLocaleString() + '</td>' +
       '<td style="color:#6688aa">' + game.unit + '</td>' +
       '<td><span class="status-badge ' + s.status + '">' + statusText + '</span></td>' +
       '<td style="color:#556677;font-size:12px">' + s.updated + '</td>' +
@@ -907,7 +907,10 @@ function openBuyModal(gameName, serverName, sellPrice, unit, stock) {
   document.getElementById('buyModalGame').value = gameName;
   document.getElementById('buyModalServer').value = serverName;
   document.getElementById('buyModalPrice').value = sellPrice.toLocaleString() + '원 / ' + unit;
-  document.getElementById('buyModalAmount').value = '';
+  var amountEl = document.getElementById('buyModalAmount');
+  amountEl.value = '';
+  amountEl.max = stock;
+  amountEl.placeholder = '최대 ' + stock.toLocaleString();
   document.getElementById('buyEstimateValue').textContent = '0원';
   document.getElementById('buyModalChar').value = '';
   document.getElementById('buyModalContact').value = '';
@@ -945,6 +948,12 @@ function submitForm(type) {
   } else {
     if (!char || !contact || !amount) {
       alert('모든 항목을 입력해주세요.');
+      return;
+    }
+    // 구매 시 재고 초과 검증
+    var maxStock = parseInt(document.getElementById('buyModalAmount').max) || 0;
+    if ((parseInt(amount) || 0) > maxStock) {
+      alert('재고(' + maxStock.toLocaleString() + ')를 초과할 수 없습니다.');
       return;
     }
   }
