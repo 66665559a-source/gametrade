@@ -351,28 +351,39 @@
     margin-top: 40px;
   }
 
-  /* 신청 완료 토스트 */
-  .submit-toast {
+  /* 신청 결과 알림 */
+  .result-overlay {
+    display: none;
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: #2a2725;
-    color: #c9a96e;
-    border: 1px solid #4a4540;
-    border-radius: 12px;
-    padding: 16px 24px;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+  }
+  .result-overlay.show { display: flex; }
+  .result-box {
+    background: #1e1c1a;
+    border: 1px solid #3a3632;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    min-width: 300px;
+    max-width: 400px;
+  }
+  .result-icon { font-size: 48px; margin-bottom: 16px; }
+  .result-message { font-size: 18px; font-weight: 600; color: #e0e6ed; margin-bottom: 24px; line-height: 1.5; }
+  .result-btn {
+    background: linear-gradient(135deg, #c9a96e, #8a7340);
+    color: #fff;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 8px;
     font-size: 15px;
     font-weight: 600;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-    z-index: 300;
-    transform: translateY(120%);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
   }
-  .submit-toast.show {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  .result-btn:hover { box-shadow: 0 4px 16px rgba(201, 169, 110, 0.4); }
   /* Loading */
   .loading-overlay {
     position: fixed;
@@ -536,8 +547,14 @@
   </div>
 </div>
 
-<!-- 신청 완료 토스트 -->
-<div class="submit-toast" id="submitToast">매입신청이 접수되었습니다.</div>
+<!-- 신청 결과 알림 -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-box">
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-message" id="resultMessage"></div>
+    <button class="result-btn" onclick="document.getElementById('resultOverlay').classList.remove('show')">확인</button>
+  </div>
+</div>
 
 <!-- Footer -->
 <div class="footer">
@@ -937,22 +954,21 @@ function submitForm(type) {
       if (data.success) {
         showSubmitToast('매입신청이 접수되었습니다.');
       } else {
-        showSubmitToast('신청 실패: ' + (data.message || '알 수 없는 오류'));
+        showSubmitToast('신청 실패: ' + (data.message || '알 수 없는 오류'), true);
       }
     } catch(e) {
       showSubmitToast('매입신청이 접수되었습니다.');
     }
   }).catch(function(err) {
-    showSubmitToast('전송 실패: ' + err.message);
+    showSubmitToast('전송 실패: ' + err.message, true);
   });
 }
 
-// ===== 신청 완료 토스트 =====
-function showSubmitToast(message) {
-  var toast = document.getElementById('submitToast');
-  toast.textContent = message || '매입신청이 접수되었습니다.';
-  toast.classList.add('show');
-  setTimeout(function() { toast.classList.remove('show'); }, 3000);
+// ===== 신청 결과 알림 =====
+function showSubmitToast(message, isError) {
+  document.getElementById('resultIcon').textContent = isError ? '\u274C' : '\u2705';
+  document.getElementById('resultMessage').textContent = message;
+  document.getElementById('resultOverlay').classList.add('show');
 }
 
 // 모달 바깥 클릭 시 닫기
