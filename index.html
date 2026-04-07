@@ -839,6 +839,11 @@ function submitForm(type) {
     alert('모든 항목을 입력해주세요.');
     return;
   }
+  var minAmount = parseInt(SETTINGS['최소수량']) || 1;
+  if ((parseInt(amount) || 0) < minAmount) {
+    alert('최소 거래 수량은 ' + minAmount + '입니다.');
+    return;
+  }
   // 재고 초과 검증
   var maxStock = parseInt(document.getElementById('buyModalAmount').max) || 0;
   if ((parseInt(amount) || 0) > maxStock) {
