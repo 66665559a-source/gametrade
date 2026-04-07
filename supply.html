@@ -733,8 +733,14 @@ function renderServers() {
 
   grid.innerHTML = game.servers.map(function(s) {
     var isBuyDisabled = !s.buyable || s.buy === 0;
-    var statusText = isBuyDisabled ? '매입불가' : '매입가능';
-    var statusClass = isBuyDisabled ? 'no_buy' : 'available';
+    var statusText, statusClass;
+    if (isBuyDisabled) {
+      statusText = '매입불가'; statusClass = 'no_buy';
+    } else if (!sellOpen) {
+      statusText = '준비중'; statusClass = 'soldout';
+    } else {
+      statusText = '매입가능'; statusClass = 'available';
+    }
     var btnDisabled = (isBuyDisabled || !sellOpen) ? 'disabled' : '';
     var btnText = isBuyDisabled ? '매입불가' : '매입신청';
     var sellHint = (!sellOpen && !isBuyDisabled) ? '<div class="time-hint">' + getHoursText('매입') + ' 가능</div>' : '';
@@ -763,6 +769,7 @@ function renderAllPrices() {
   var game = DATA[currentGame];
   if (!game) return;
   document.getElementById('allPricesTitle').textContent = game.name + ' 전체 시세표';
+  var sellOpen = isOperatingHours('매입');
 
   var servers = game.servers.slice();
 
@@ -801,8 +808,14 @@ function renderAllPrices() {
   var html = '';
   servers.forEach(function(s) {
     var isBuyDisabled = !s.buyable || s.buy === 0;
-    var statusText = isBuyDisabled ? '매입불가' : '매입가능';
-    var statusClass = isBuyDisabled ? 'no_buy' : 'available';
+    var statusText, statusClass;
+    if (isBuyDisabled) {
+      statusText = '매입불가'; statusClass = 'no_buy';
+    } else if (!sellOpen) {
+      statusText = '준비중'; statusClass = 'soldout';
+    } else {
+      statusText = '매입가능'; statusClass = 'available';
+    }
     var priceColor = isBuyDisabled ? '#ef5350' : '#c9a96e';
     html += '<tr>' +
       '<td>' + s.name + '</td>' +

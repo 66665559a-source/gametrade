@@ -690,8 +690,14 @@ function renderServers() {
 
   grid.innerHTML = game.servers.map(function(s) {
     var hasStock = s.stock > 0;
-    var statusText = hasStock ? '구매가능' : '품절';
-    var statusClass = hasStock ? 'available' : 'soldout';
+    var statusText, statusClass;
+    if (!hasStock) {
+      statusText = '품절'; statusClass = 'soldout';
+    } else if (!buyOpen) {
+      statusText = '준비중'; statusClass = 'soldout';
+    } else {
+      statusText = '구매가능'; statusClass = 'available';
+    }
     var buyDisabled = (!hasStock || !buyOpen) ? 'disabled' : '';
     var buyHint = !buyOpen ? '<div class="time-hint">' + getHoursText('판매') + ' 가능</div>' : '';
 
@@ -723,6 +729,7 @@ function renderAllPrices() {
   var game = DATA[currentGame];
   if (!game) return;
   document.getElementById('allPricesTitle').textContent = game.name + ' 전체 시세표';
+  var buyOpen = isOperatingHours('판매');
 
   var servers = game.servers.slice();
 
@@ -762,8 +769,14 @@ function renderAllPrices() {
   var html = '';
   servers.forEach(function(s) {
     var hasStock = s.stock > 0;
-    var statusText = hasStock ? '구매가능' : '품절';
-    var statusClass = hasStock ? 'available' : 'soldout';
+    var statusText, statusClass;
+    if (!hasStock) {
+      statusText = '품절'; statusClass = 'soldout';
+    } else if (!buyOpen) {
+      statusText = '준비중'; statusClass = 'soldout';
+    } else {
+      statusText = '구매가능'; statusClass = 'available';
+    }
     html += '<tr>' +
       '<td>' + s.name + '</td>' +
       '<td style="color:#ef5350;font-weight:600">' + s.sell.toLocaleString() + '원</td>' +
