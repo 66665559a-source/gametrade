@@ -150,11 +150,6 @@
     color: #ffa726;
     border: 1px solid rgba(255, 152, 0, 0.3);
   }
-  .status-badge.no_buy {
-    background: rgba(76, 175, 80, 0.15);
-    color: #66bb6a;
-    border: 1px solid rgba(76, 175, 80, 0.3);
-  }
   .price-row {
     display: flex;
     justify-content: space-between;
@@ -514,71 +509,70 @@
 // ===== 설정 =====
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4JLvHRzJ5SAul9FndY28k1n2ywki9qWuBC5C7WKR4gwtweygJqmEnELl4yeWA2l8y/exec';
 
-// ===== 게임 아이콘/색상 맵 (game_id별) =====
+// ===== 게임 아이콘/색상 맵 (game_name별) =====
 var GAME_STYLE = {
-  LINC:    { icon: '&#9876;', gradient: 'linear-gradient(135deg, #8b5e3c, #5d3a1a)' },
-  AION2:   { icon: '&#10040;', gradient: 'linear-gradient(135deg, #3a7bd5, #1a3a6a)' },
-  LIN2:    { icon: '&#9733;', gradient: 'linear-gradient(135deg, #6a1b9a, #4a148c)' },
-  LOSTARK: { icon: '&#9830;', gradient: 'linear-gradient(135deg, #e65100, #bf360c)' }
+  '리니지 클래식': { icon: '&#9876;', gradient: 'linear-gradient(135deg, #8b5e3c, #5d3a1a)' },
+  '아이온2':      { icon: '&#10040;', gradient: 'linear-gradient(135deg, #3a7bd5, #1a3a6a)' },
+  '리니지2':      { icon: '&#9733;', gradient: 'linear-gradient(135deg, #6a1b9a, #4a148c)' },
+  '로스트아크':    { icon: '&#9830;', gradient: 'linear-gradient(135deg, #e65100, #bf360c)' }
 };
 var DEFAULT_STYLE = { icon: '&#9679;', gradient: 'linear-gradient(135deg, #455a64, #263238)' };
 
 // ===== 더미 데이터 (API 연결 전 폴백) =====
-// status: 'available' = 거래가능, 'soldout' = 품절(구매불가)
 var FALLBACK_DATA = {
-  linc: {
+  '리니지 클래식': {
     name: '리니지 클래식',
     unit: '1억',
-    color: '#8b5e3c',
+    sort_order: 1,
     servers: [
-      { name: '바츠', sell: 35000, buy: 30000, status: 'available', stock: 50, updated: '2026-03-25 14:00' },
-      { name: '켄라우헬', sell: 38000, buy: 33000, status: 'available', stock: 30, updated: '2026-03-25 13:30' },
-      { name: '데포로쥬', sell: 32000, buy: 27000, status: 'available', stock: 20, updated: '2026-03-25 12:00' },
-      { name: '아인하사드', sell: 36000, buy: 31000, status: 'available', stock: 45, updated: '2026-03-25 14:00' },
-      { name: '지그하르트', sell: 34000, buy: 29000, status: 'soldout', stock: 0, updated: '2026-03-25 10:00' },
-      { name: '테온', sell: 33000, buy: 0, status: 'no_buy', stock: 10, updated: '2026-03-25 09:00' },
+      { name: '바츠', sell: 35000, buy: 30000, buyable: true, stock: 50, updated: '2026-03-25 14:00' },
+      { name: '켄라우헬', sell: 38000, buy: 33000, buyable: true, stock: 30, updated: '2026-03-25 13:30' },
+      { name: '데포로쥬', sell: 32000, buy: 27000, buyable: true, stock: 20, updated: '2026-03-25 12:00' },
+      { name: '아인하사드', sell: 36000, buy: 31000, buyable: true, stock: 45, updated: '2026-03-25 14:00' },
+      { name: '지그하르트', sell: 34000, buy: 29000, buyable: true, stock: 0, updated: '2026-03-25 10:00' },
+      { name: '테온', sell: 33000, buy: 0, buyable: false, stock: 10, updated: '2026-03-25 09:00' },
     ]
   },
-  aion2: {
+  '아이온2': {
     name: '아이온2',
     unit: '100만',
-    color: '#3a7bd5',
+    sort_order: 2,
     servers: [
-      { name: '이스라펠', sell: 12000, buy: 9500, status: 'available', stock: 100, updated: '2026-03-25 14:00' },
-      { name: '시엘', sell: 11000, buy: 8800, status: 'available', stock: 80, updated: '2026-03-25 13:00' },
-      { name: '지켈', sell: 13000, buy: 10500, status: 'available', stock: 60, updated: '2026-03-25 14:00' },
-      { name: '네자칸', sell: 10500, buy: 8500, status: 'soldout', stock: 0, updated: '2026-03-25 11:30' },
+      { name: '이스라펠', sell: 12000, buy: 9500, buyable: true, stock: 100, updated: '2026-03-25 14:00' },
+      { name: '시엘', sell: 11000, buy: 8800, buyable: true, stock: 80, updated: '2026-03-25 13:00' },
+      { name: '지켈', sell: 13000, buy: 10500, buyable: true, stock: 60, updated: '2026-03-25 14:00' },
+      { name: '네자칸', sell: 10500, buy: 8500, buyable: true, stock: 0, updated: '2026-03-25 11:30' },
     ]
   },
-  lin2: {
+  '리니지2': {
     name: '리니지2',
     unit: '1억',
-    color: '#6a1b9a',
+    sort_order: 3,
     servers: [
-      { name: '아덴', sell: 8500, buy: 7000, status: 'available', stock: 35, updated: '2026-03-25 13:00' },
-      { name: '바이움', sell: 9000, buy: 7500, status: 'available', stock: 25, updated: '2026-03-25 13:00' },
-      { name: '오렌', sell: 7500, buy: 6000, status: 'no_buy', stock: 15, updated: '2026-03-24 18:00' },
+      { name: '아덴', sell: 8500, buy: 7000, buyable: true, stock: 35, updated: '2026-03-25 13:00' },
+      { name: '바이움', sell: 9000, buy: 7500, buyable: true, stock: 25, updated: '2026-03-25 13:00' },
+      { name: '오렌', sell: 7500, buy: 6000, buyable: false, stock: 15, updated: '2026-03-24 18:00' },
     ]
   },
-  lost: {
+  '로스트아크': {
     name: '로스트아크',
     unit: '1만골드',
-    color: '#e65100',
+    sort_order: 4,
     servers: [
-      { name: '카단', sell: 950, buy: 750, status: 'available', stock: 200, updated: '2026-03-25 14:00' },
-      { name: '카마인', sell: 900, buy: 700, status: 'available', stock: 150, updated: '2026-03-25 14:00' },
-      { name: '실리안', sell: 880, buy: 680, status: 'soldout', stock: 0, updated: '2026-03-25 12:00' },
+      { name: '카단', sell: 950, buy: 750, buyable: true, stock: 200, updated: '2026-03-25 14:00' },
+      { name: '카마인', sell: 900, buy: 700, buyable: true, stock: 150, updated: '2026-03-25 14:00' },
+      { name: '실리안', sell: 880, buy: 680, buyable: true, stock: 0, updated: '2026-03-25 12:00' },
     ]
   }
 };
 
 var FALLBACK_SETTINGS = {
-  trade_sell_start_time: '09:00',
-  trade_sell_end_time: '22:00',
-  trade_buy_start_time: '10:00',
-  trade_buy_end_time: '21:00',
-  site_notice: '점검시간: 매주 수요일 06:00~08:00',
-  min_amount: '1'
+  '매입_시작시간': '09:00',
+  '매입_종료시간': '22:00',
+  '판매_시작시간': '10:00',
+  '판매_종료시간': '21:00',
+  '판매페이지_공지': '',
+  '최소수량': '1'
 };
 
 var DATA = {};
@@ -630,8 +624,8 @@ function initPage() {
 // ============================================================
 
 function updateNotice() {
-  var buyH = (SETTINGS.trade_buy_start_time || '10:00') + '~' + (SETTINGS.trade_buy_end_time || '21:00');
-  var notice = SETTINGS.site_notice || '';
+  var buyH = (SETTINGS['판매_시작시간'] || '10:00') + '~' + (SETTINGS['판매_종료시간'] || '21:00');
+  var notice = SETTINGS['판매페이지_공지'] || '';
   document.getElementById('noticeBar').innerHTML =
     '[공지] 구매 가능시간: ' + buyH + (notice ? ' | ' + notice : '');
 }
@@ -664,13 +658,14 @@ function renderGameTabs() {
 function isOperatingHours(type) {
   var now = new Date();
   var cur = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-  var start = SETTINGS['trade_' + type + '_start_time'] || '00:00';
-  var end = SETTINGS['trade_' + type + '_end_time'] || '23:59';
+  var start = SETTINGS[type + '_시작시간'] || '00:00';
+  var end = SETTINGS[type + '_종료시간'] || '23:59';
+  if (end < start) return cur >= start || cur <= end;
   return cur >= start && cur <= end;
 }
 
 function getHoursText(type) {
-  return (SETTINGS['trade_' + type + '_start_time'] || '00:00') + '~' + (SETTINGS['trade_' + type + '_end_time'] || '23:59');
+  return (SETTINGS[type + '_시작시간'] || '00:00') + '~' + (SETTINGS[type + '_종료시간'] || '23:59');
 }
 
 // ============================================================
@@ -691,13 +686,14 @@ function renderServers() {
   if (!game) return;
   document.getElementById('serverTitle').textContent = game.name + ' 서버별 시세';
   var grid = document.getElementById('serverGrid');
-  var buyOpen = isOperatingHours('buy');
+  var buyOpen = isOperatingHours('판매');
 
   grid.innerHTML = game.servers.map(function(s) {
-    var statusText = (s.status === 'available' || s.status === 'no_buy') ? '거래가능' : '품절';
-    var statusClass = (s.status === 'available' || s.status === 'no_buy') ? 'available' : 'soldout';
-    var buyDisabled = (s.status === 'soldout' || s.stock <= 0 || !buyOpen) ? 'disabled' : '';
-    var buyHint = !buyOpen ? '<div class="time-hint">' + getHoursText('buy') + ' 가능</div>' : '';
+    var hasStock = s.stock > 0;
+    var statusText = hasStock ? '구매가능' : '품절';
+    var statusClass = hasStock ? 'available' : 'soldout';
+    var buyDisabled = (!hasStock || !buyOpen) ? 'disabled' : '';
+    var buyHint = !buyOpen ? '<div class="time-hint">' + getHoursText('판매') + ' 가능</div>' : '';
 
     return '<div class="price-card">' +
       '<div class="card-header">' +
@@ -740,8 +736,8 @@ function renderAllPrices() {
         case 'stock': va = a.stock; vb = b.stock; break;
         case 'unit': va = game.unit; vb = game.unit; break;
         case 'status':
-          var order = { available: 0, soldout: 1, no_buy: 2 };
-          va = order[a.status]; vb = order[b.status]; break;
+          va = a.stock > 0 ? 0 : 1;
+          vb = b.stock > 0 ? 0 : 1; break;
         case 'updated': va = a.updated; vb = b.updated; break;
         default: va = ''; vb = '';
       }
@@ -765,8 +761,9 @@ function renderAllPrices() {
   var tbody = document.getElementById('allPricesBody');
   var html = '';
   servers.forEach(function(s) {
-    var statusText = (s.status === 'available' || s.status === 'no_buy') ? '거래가능' : '품절';
-    var statusClass = (s.status === 'available' || s.status === 'no_buy') ? 'available' : 'soldout';
+    var hasStock = s.stock > 0;
+    var statusText = hasStock ? '구매가능' : '품절';
+    var statusClass = hasStock ? 'available' : 'soldout';
     html += '<tr>' +
       '<td>' + s.name + '</td>' +
       '<td style="color:#ef5350;font-weight:600">' + s.sell.toLocaleString() + '원</td>' +
@@ -792,8 +789,8 @@ function sortTable(col) {
 
 // ===== 구매신청 모달 =====
 function openBuyModal(gameName, serverName, sellPrice, unit, stock) {
-  if (!isOperatingHours('buy')) {
-    alert('현재 구매신청 가능 시간이 아닙니다.\n운영시간: ' + getHoursText('buy'));
+  if (!isOperatingHours('판매')) {
+    alert('현재 구매신청 가능 시간이 아닙니다.\n운영시간: ' + getHoursText('판매'));
     return;
   }
   modalPrice = sellPrice;
@@ -840,7 +837,7 @@ function submitForm(type) {
   }
 
   // 운영시간 재확인
-  if (!isOperatingHours('buy')) {
+  if (!isOperatingHours('판매')) {
     alert('현재 구매신청 가능 시간이 아닙니다.');
     return;
   }
@@ -854,25 +851,12 @@ function submitForm(type) {
   var gameData = DATA[currentGame] || {};
   var unit = gameData.unit || '';
 
-  // server_id 찾기
-  var serverId = '';
-  if (DATA[currentGame]) {
-    var servers = DATA[currentGame].servers;
-    for (var i = 0; i < servers.length; i++) {
-      if (servers[i].name === serverName) {
-        serverId = servers[i].server_id || '';
-        break;
-      }
-    }
-  }
-
   // API 전송 payload
   var payload = {
     action: 'submit',
     type: '구매',
     game_name: gameName,
     server_name: serverName,
-    server_id: serverId,
     amount: parseInt(amount) || 0,
     unit: unit,
     unit_price: modalPrice,
