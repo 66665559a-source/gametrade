@@ -802,10 +802,7 @@ function sortTable(col) {
 
 // ===== 구매신청 모달 =====
 function openBuyModal(gameName, serverName, sellPrice, unit, stock) {
-  if (!isOperatingHours('판매')) {
-    alert('현재 구매신청 가능 시간이 아닙니다.\n운영시간: ' + getHoursText('판매'));
-    return;
-  }
+  if (!isOperatingHours('판매')) return;
   modalPrice = sellPrice;
   document.getElementById('buyModalGame').value = gameName;
   document.getElementById('buyModalServer').value = serverName;
@@ -850,10 +847,7 @@ function submitForm(type) {
   }
 
   // 운영시간 재확인
-  if (!isOperatingHours('판매')) {
-    alert('현재 구매신청 가능 시간이 아닙니다.');
-    return;
-  }
+  if (!isOperatingHours('판매')) return;
 
   var gameName = document.getElementById(prefix + 'Game').value;
   var serverName = document.getElementById(prefix + 'Server').value;
@@ -880,15 +874,29 @@ function submitForm(type) {
   };
 
   closeModal(type + 'Modal');
-  showSubmitToast('구매신청이 접수되었습니다.');
+  showSubmitToast('신청 전송 중...');
 
-  // 백그라운드 API 전송 (미연결 시 무시)
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload),
     redirect: 'follow'
-  }).catch(function() {});
+  }).then(function(res) {
+    return res.text();
+  }).then(function(text) {
+    try {
+      var data = JSON.parse(text);
+      if (data.success) {
+        showSubmitToast('구매신청이 접수되었습니다.');
+      } else {
+        showSubmitToast('신청 실패: ' + (data.message || '알 수 없는 오류'));
+      }
+    } catch(e) {
+      showSubmitToast('구매신청이 접수되었습니다.');
+    }
+  }).catch(function(err) {
+    showSubmitToast('전송 실패: ' + err.message);
+  });
 }
 
 // ===== 신청 완료 토스트 =====

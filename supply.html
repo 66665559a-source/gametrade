@@ -842,7 +842,6 @@ function sortTable(col) {
 // ===== 매입신청 모달 =====
 function openSellModal(gameName, serverName, buyPrice, unit) {
   if (!isOperatingHours('매입')) {
-    alert('현재 매입신청 가능 시간이 아닙니다.\n운영시간: ' + getHoursText('매입'));
     return;
   }
   modalPrice = buyPrice;
@@ -890,7 +889,6 @@ function submitForm(type) {
 
   // 운영시간 재확인
   if (!isOperatingHours('매입')) {
-    alert('현재 매입신청 가능 시간이 아닙니다.');
     return;
   }
 
@@ -919,15 +917,29 @@ function submitForm(type) {
   };
 
   closeModal(type + 'Modal');
-  showSubmitToast('매입신청이 접수되었습니다.');
+  showSubmitToast('신청 전송 중...');
 
-  // 백그라운드 API 전송 (미연결 시 무시)
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload),
     redirect: 'follow'
-  }).catch(function() {});
+  }).then(function(res) {
+    return res.text();
+  }).then(function(text) {
+    try {
+      var data = JSON.parse(text);
+      if (data.success) {
+        showSubmitToast('매입신청이 접수되었습니다.');
+      } else {
+        showSubmitToast('신청 실패: ' + (data.message || '알 수 없는 오류'));
+      }
+    } catch(e) {
+      showSubmitToast('매입신청이 접수되었습니다.');
+    }
+  }).catch(function(err) {
+    showSubmitToast('전송 실패: ' + err.message);
+  });
 }
 
 // ===== 신청 완료 토스트 =====
