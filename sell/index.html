@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameTrade - 게임 재화 시세 조회</title>
+<title>GameTrade Supply - 공급자 매입신청</title>
+<meta name="robots" content="noindex, nofollow">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
-    background: #0f1923;
+    background: #171614;
     color: #e0e6ed;
     min-height: 100vh;
   }
 
   /* Header */
   .header {
-    background: linear-gradient(135deg, #1a2a3a 0%, #0d1b2a 100%);
-    border-bottom: 1px solid #1e3a5f;
+    background: linear-gradient(135deg, #242220 0%, #141312 100%);
+    border-bottom: 1px solid #3a3632;
     padding: 0 20px;
     position: sticky;
     top: 0;
@@ -33,10 +34,10 @@
   .logo {
     font-size: 22px;
     font-weight: 700;
-    color: #4fc3f7;
+    color: #c9a96e;
     letter-spacing: -0.5px;
   }
-  .logo span { color: #ff8a65; }
+  .logo span { color: #d4b87a; }
   .header-nav { display: flex; gap: 24px; }
   .header-nav a {
     color: #8899aa;
@@ -44,12 +45,12 @@
     font-size: 14px;
     transition: color 0.2s;
   }
-  .header-nav a:hover, .header-nav a.active { color: #4fc3f7; }
+  .header-nav a:hover, .header-nav a.active { color: #c9a96e; }
 
   /* Notice Bar */
   .notice-bar {
-    background: #1a2a3a;
-    border-bottom: 1px solid #1e3a5f;
+    background: #242220;
+    border-bottom: 1px solid #3a3632;
     padding: 10px 20px;
     text-align: center;
     font-size: 13px;
@@ -67,8 +68,8 @@
     flex-wrap: wrap;
   }
   .game-tab {
-    background: #1a2a3a;
-    border: 1px solid #1e3a5f;
+    background: #242220;
+    border: 1px solid #3a3632;
     border-radius: 10px;
     padding: 14px 24px;
     cursor: pointer;
@@ -78,11 +79,11 @@
     gap: 10px;
     min-width: 160px;
   }
-  .game-tab:hover { border-color: #4fc3f7; }
+  .game-tab:hover { border-color: #c9a96e; }
   .game-tab.active {
-    border-color: #4fc3f7;
-    background: linear-gradient(135deg, #1a3a5a 0%, #1a2a3a 100%);
-    box-shadow: 0 0 20px rgba(79, 195, 247, 0.1);
+    border-color: #c9a96e;
+    background: linear-gradient(135deg, #2e2a27 0%, #242220 100%);
+    box-shadow: 0 0 20px rgba(201, 169, 110, 0.1);
   }
   .game-tab .game-icon {
     width: 40px; height: 40px;
@@ -112,14 +113,14 @@
     margin-bottom: 40px;
   }
   .price-card {
-    background: #152232;
-    border: 1px solid #1e3a5f;
+    background: #1e1c1a;
+    border: 1px solid #3a3632;
     border-radius: 12px;
     padding: 20px;
     transition: all 0.2s;
   }
   .price-card:hover {
-    border-color: #2a5a8f;
+    border-color: #4a4540;
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   }
@@ -141,21 +142,21 @@
     font-weight: 600;
   }
   .status-badge.available {
-    background: rgba(76, 175, 80, 0.15);
-    color: #66bb6a;
-    border: 1px solid rgba(76, 175, 80, 0.3);
+    background: rgba(201, 169, 110, 0.15);
+    color: #c9a96e;
+    border: 1px solid rgba(201, 169, 110, 0.3);
   }
-  .status-badge.soldout {
-    background: rgba(255, 152, 0, 0.15);
-    color: #ffa726;
-    border: 1px solid rgba(255, 152, 0, 0.3);
+  .status-badge.no_buy {
+    background: rgba(239, 83, 80, 0.15);
+    color: #ef5350;
+    border: 1px solid rgba(239, 83, 80, 0.3);
   }
   .price-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #1a2a3a;
+    border-bottom: 1px solid #242220;
   }
   .price-row:last-of-type { border-bottom: none; }
   .price-label {
@@ -166,7 +167,7 @@
     font-size: 20px;
     font-weight: 700;
   }
-  .price-value.sell { color: #ef5350; }
+  .price-value.buy { color: #c9a96e; }
   .price-unit {
     font-size: 12px;
     color: #6688aa;
@@ -179,7 +180,7 @@
     align-items: center;
     margin-top: 14px;
     padding-top: 14px;
-    border-top: 1px solid #1a2a3a;
+    border-top: 1px solid #242220;
   }
   .updated-time {
     font-size: 11px;
@@ -189,8 +190,8 @@
     display: flex;
     gap: 8px;
   }
-  .btn-buy {
-    background: linear-gradient(135deg, #ef5350, #c62828);
+  .btn-sell {
+    background: linear-gradient(135deg, #c9a96e, #8a7340);
     color: #fff;
     border: none;
     padding: 8px 16px;
@@ -200,11 +201,11 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .btn-buy:hover {
+  .btn-sell:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+    box-shadow: 0 4px 12px rgba(201, 169, 110, 0.4);
   }
-  .btn-buy:disabled {
+  .btn-sell:disabled {
     background: #2a3a4a;
     color: #556677;
     cursor: not-allowed;
@@ -224,8 +225,8 @@
   }
   .modal-overlay.show { display: flex; }
   .modal {
-    background: #152232;
-    border: 1px solid #1e3a5f;
+    background: #1e1c1a;
+    border: 1px solid #3a3632;
     border-radius: 16px;
     padding: 32px;
     width: 90%;
@@ -236,7 +237,7 @@
     font-size: 20px;
     margin-bottom: 20px;
   }
-  .modal h2.buy-title { color: #ef5350; }
+  .modal h2.sell-title { color: #c9a96e; }
   .modal-close {
     position: absolute;
     top: 16px; right: 20px;
@@ -256,21 +257,31 @@
   .form-group input, .form-group select {
     width: 100%;
     padding: 10px 14px;
-    background: #0f1923;
-    border: 1px solid #1e3a5f;
+    background: #171614;
+    border: 1px solid #3a3632;
     border-radius: 8px;
     color: #e0e6ed;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
   }
-  .form-group input:focus { border-color: #4fc3f7; }
+  .form-group input:focus, .form-group select:focus { border-color: #c9a96e; }
   .form-group .readonly {
-    background: #1a2a3a;
+    background: #242220;
     color: #8899aa;
   }
+  .bank-row {
+    display: flex;
+    gap: 8px;
+  }
+  .bank-row select {
+    width: 40%;
+  }
+  .bank-row input {
+    width: 60%;
+  }
   .estimate {
-    background: #1a2a3a;
+    background: #242220;
     border-radius: 8px;
     padding: 14px;
     text-align: center;
@@ -289,21 +300,21 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .btn-submit.buy-submit {
-    background: linear-gradient(135deg, #ef5350, #c62828);
+  .btn-submit.sell-submit {
+    background: linear-gradient(135deg, #c9a96e, #8a7340);
   }
-  .btn-submit.buy-submit:hover { box-shadow: 0 4px 16px rgba(239, 83, 80, 0.4); }
+  .btn-submit.sell-submit:hover { box-shadow: 0 4px 16px rgba(201, 169, 110, 0.4); }
 
   /* All Prices Table */
   .all-prices-table {
     width: 100%;
     border-collapse: collapse;
-    background: #152232;
+    background: #1e1c1a;
     border-radius: 12px;
     overflow: hidden;
   }
   .all-prices-table th {
-    background: #1a2a3a;
+    background: #242220;
     padding: 12px 16px;
     text-align: left;
     font-size: 13px;
@@ -314,25 +325,25 @@
     transition: color 0.2s;
     white-space: nowrap;
   }
-  .all-prices-table th:hover { color: #4fc3f7; }
+  .all-prices-table th:hover { color: #c9a96e; }
   .all-prices-table th .sort-arrow {
     display: inline-block;
     margin-left: 4px;
     font-size: 10px;
     color: #3a4a5a;
   }
-  .all-prices-table th.sort-asc .sort-arrow { color: #4fc3f7; }
-  .all-prices-table th.sort-desc .sort-arrow { color: #4fc3f7; }
+  .all-prices-table th.sort-asc .sort-arrow { color: #c9a96e; }
+  .all-prices-table th.sort-desc .sort-arrow { color: #c9a96e; }
   .all-prices-table td {
     padding: 12px 16px;
-    border-bottom: 1px solid #1a2a3a;
+    border-bottom: 1px solid #242220;
     font-size: 14px;
   }
-  .all-prices-table tr:hover td { background: rgba(79, 195, 247, 0.03); }
+  .all-prices-table tr:hover td { background: rgba(66, 165, 245, 0.03); }
 
   /* Footer */
   .footer {
-    border-top: 1px solid #1e3a5f;
+    border-top: 1px solid #3a3632;
     padding: 30px 20px;
     text-align: center;
     color: #3a4a5a;
@@ -352,8 +363,8 @@
   }
   .result-overlay.show { display: flex; }
   .result-box {
-    background: #152232;
-    border: 1px solid #1e3a5f;
+    background: #1e1c1a;
+    border: 1px solid #3a3632;
     border-radius: 16px;
     padding: 32px;
     text-align: center;
@@ -363,7 +374,7 @@
   .result-icon { font-size: 48px; margin-bottom: 16px; }
   .result-message { font-size: 18px; font-weight: 600; color: #e0e6ed; margin-bottom: 24px; line-height: 1.5; }
   .result-btn {
-    background: linear-gradient(135deg, #4fc3f7, #1e88e5);
+    background: linear-gradient(135deg, #c9a96e, #8a7340);
     color: #fff;
     border: none;
     padding: 12px 40px;
@@ -372,12 +383,12 @@
     font-weight: 600;
     cursor: pointer;
   }
-  .result-btn:hover { box-shadow: 0 4px 16px rgba(79, 195, 247, 0.4); }
+  .result-btn:hover { box-shadow: 0 4px 16px rgba(201, 169, 110, 0.4); }
   /* Loading */
   .loading-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #0f1923;
+    background: #171614;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -388,8 +399,8 @@
   .loading-overlay.hide { opacity: 0; pointer-events: none; }
   .loading-spinner {
     width: 40px; height: 40px;
-    border: 3px solid #1e3a5f;
-    border-top-color: #4fc3f7;
+    border: 3px solid #3a3632;
+    border-top-color: #c9a96e;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -418,15 +429,15 @@
 <!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
-  <div class="loading-text">시세 데이터를 불러오는 중...</div>
+  <div class="loading-text">매입 데이터를 불러오는 중...</div>
 </div>
 
 <!-- Header -->
 <div class="header">
   <div class="header-inner">
-    <div class="logo">Game<span>Trade</span></div>
+    <div class="logo">Game<span>Trade Supply</span></div>
     <div class="header-nav">
-      <a href="#" class="active">시세 조회</a>
+      <a href="#" class="active">매입 시세</a>
       <a href="#all-prices">전체 시세표</a>
       <a href="#">이용안내</a>
     </div>
@@ -446,19 +457,18 @@
   <div class="game-tabs" id="gameTabs"></div>
 
   <!-- Server Price Cards -->
-  <div class="section-title" id="serverTitle">리니지 클래식 서버별 시세</div>
+  <div class="section-title" id="serverTitle">리니지 클래식 서버별 매입가</div>
   <div class="server-grid" id="serverGrid"></div>
 
   <!-- All Prices (selected game only) -->
   <div id="all-prices" style="margin-top: 20px;">
     <div class="section-title" id="allPricesTitle">리니지 클래식 전체 시세표</div>
-    <div style="border-radius: 12px; overflow: hidden; border: 1px solid #1e3a5f;">
+    <div style="border-radius: 12px; overflow: hidden; border: 1px solid #3a3632;">
       <table class="all-prices-table" id="allPricesTable">
         <thead>
           <tr>
             <th data-col="name" data-type="string" onclick="sortTable('name')">서버 <span class="sort-arrow">&#9650;&#9660;</span></th>
-            <th data-col="sell" data-type="number" onclick="sortTable('sell')">가격 <span class="sort-arrow">&#9650;&#9660;</span></th>
-            <th data-col="stock" data-type="number" onclick="sortTable('stock')">재고 <span class="sort-arrow">&#9650;&#9660;</span></th>
+            <th data-col="buy" data-type="number" onclick="sortTable('buy')">매입가 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="unit" data-type="string" onclick="sortTable('unit')">단위 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="status" data-type="string" onclick="sortTable('status')">상태 <span class="sort-arrow">&#9650;&#9660;</span></th>
             <th data-col="updated" data-type="string" onclick="sortTable('updated')">업데이트 <span class="sort-arrow">&#9650;&#9660;</span></th>
@@ -471,40 +481,69 @@
 
 </div>
 
-<!-- Buy Modal -->
-<div class="modal-overlay" id="buyModal">
+<!-- Sell Modal (매입신청) -->
+<div class="modal-overlay" id="sellModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('buyModal')">&times;</button>
-    <h2 class="buy-title">구매신청</h2>
+    <button class="modal-close" onclick="closeModal('sellModal')">&times;</button>
+    <h2 class="sell-title">매입신청</h2>
     <div class="form-group">
       <label>게임</label>
-      <input type="text" class="readonly" id="buyModalGame" readonly>
+      <input type="text" class="readonly" id="sellModalGame" readonly>
     </div>
     <div class="form-group">
       <label>서버</label>
-      <input type="text" class="readonly" id="buyModalServer" readonly>
+      <input type="text" class="readonly" id="sellModalServer" readonly>
     </div>
     <div class="form-group">
-      <label>단가</label>
-      <input type="text" class="readonly" id="buyModalPrice" readonly>
+      <label>매입단가</label>
+      <input type="text" class="readonly" id="sellModalPrice" readonly>
     </div>
     <div class="form-group">
-      <label>구매수량</label>
-      <input type="number" id="buyModalAmount" placeholder="예: 5" min="1" oninput="calcEstimate('buy')">
+      <label>수량</label>
+      <input type="number" id="sellModalAmount" placeholder="예: 5" min="1" oninput="calcEstimate('sell')">
     </div>
     <div class="estimate">
-      <div class="estimate-label">예상 결제금액</div>
-      <div class="estimate-value" id="buyEstimateValue">0원</div>
+      <div class="estimate-label">예상 정산금액</div>
+      <div class="estimate-value" id="sellEstimateValue">0원</div>
     </div>
     <div class="form-group">
       <label>캐릭터명</label>
-      <input type="text" id="buyModalChar" placeholder="게임 내 캐릭터명">
+      <input type="text" id="sellModalChar" placeholder="게임 내 캐릭터명">
     </div>
     <div class="form-group">
       <label>연락처</label>
-      <input type="text" id="buyModalContact" placeholder="010-0000-0000">
+      <input type="text" id="sellModalContact" placeholder="010-0000-0000">
     </div>
-    <button class="btn-submit buy-submit" onclick="submitForm('buy')">구매신청</button>
+    <div class="form-group">
+      <label>입금계좌</label>
+      <div class="bank-row">
+        <select id="sellModalBank">
+          <option value="">은행 선택</option>
+          <option value="국민은행">국민은행</option>
+          <option value="신한은행">신한은행</option>
+          <option value="우리은행">우리은행</option>
+          <option value="하나은행">하나은행</option>
+          <option value="농협은행">농협은행</option>
+          <option value="기업은행">기업은행</option>
+          <option value="SC제일은행">SC제일은행</option>
+          <option value="카카오뱅크">카카오뱅크</option>
+          <option value="토스뱅크">토스뱅크</option>
+          <option value="케이뱅크">케이뱅크</option>
+          <option value="새마을금고">새마을금고</option>
+          <option value="신협">신협</option>
+          <option value="우체국">우체국</option>
+          <option value="수협">수협</option>
+          <option value="대구은행">대구은행</option>
+          <option value="부산은행">부산은행</option>
+          <option value="경남은행">경남은행</option>
+          <option value="광주은행">광주은행</option>
+          <option value="전북은행">전북은행</option>
+          <option value="제주은행">제주은행</option>
+        </select>
+        <input type="text" id="sellModalAccount" placeholder="계좌번호">
+      </div>
+    </div>
+    <button class="btn-submit sell-submit" onclick="submitForm('sell')">매입신청</button>
   </div>
 </div>
 
@@ -588,7 +627,7 @@ var FALLBACK_SETTINGS = {
   '매입_종료시간': '22:00',
   '판매_시작시간': '10:00',
   '판매_종료시간': '21:00',
-  '판매페이지_공지': '',
+  '매입페이지_공지': '',
   '최소수량': '1'
 };
 
@@ -596,6 +635,9 @@ var DATA = {};
 var SETTINGS = {};
 var currentGame = '';
 var modalPrice = 0;
+var modalUnit = '';
+var modalGameName = '';
+var modalServerName = '';
 var currentSort = { col: null, dir: null };
 
 // ============================================================
@@ -642,8 +684,8 @@ function useFallback() {
   SETTINGS = FALLBACK_SETTINGS;
   document.getElementById('loadingOverlay').innerHTML =
     '<div style="text-align:center;color:#ef5350;font-size:16px;padding:20px;">' +
-    '시세 데이터를 불러올 수 없습니다.<br><br>' +
-    '<button onclick="location.reload()" style="background:#1e3a5f;color:#4fc3f7;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;">다시 시도</button></div>';
+    '매입 데이터를 불러올 수 없습니다.<br><br>' +
+    '<button onclick="location.reload()" style="background:#3a3632;color:#c9a96e;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;">다시 시도</button></div>';
   document.getElementById('loadingOverlay').classList.remove('hide');
 }
 
@@ -660,10 +702,10 @@ function initPage() {
 // ============================================================
 
 function updateNotice() {
-  var buyH = (SETTINGS['판매_시작시간'] || '10:00') + '~' + (SETTINGS['판매_종료시간'] || '21:00');
-  var notice = SETTINGS['판매페이지_공지'] || '';
+  var sellH = (SETTINGS['매입_시작시간'] || '09:00') + '~' + (SETTINGS['매입_종료시간'] || '22:00');
+  var notice = SETTINGS['매입페이지_공지'] || '';
   document.getElementById('noticeBar').innerHTML =
-    '[공지] 구매 가능시간: ' + buyH + (notice ? ' | ' + notice : '');
+    '[공지] 매입 가능시간: ' + sellH + (notice ? ' | ' + notice : '');
 }
 
 function renderGameTabs() {
@@ -705,7 +747,8 @@ function getHoursText(type) {
 }
 
 // ============================================================
-// 게임 선택 =====
+// 게임 선택
+// ============================================================
 function selectGame(gameId) {
   currentGame = gameId;
   currentSort = { col: null, dir: null };
@@ -720,22 +763,23 @@ function selectGame(gameId) {
 function renderServers() {
   var game = DATA[currentGame];
   if (!game) return;
-  document.getElementById('serverTitle').textContent = game.name + ' 서버별 시세';
+  document.getElementById('serverTitle').textContent = game.name + ' 서버별 매입가';
   var grid = document.getElementById('serverGrid');
-  var buyOpen = isOperatingHours('판매');
+  var sellOpen = isOperatingHours('매입');
 
   grid.innerHTML = game.servers.map(function(s) {
-    var hasStock = s.stock > 0;
+    var isBuyDisabled = !s.buyable || s.buy === 0;
     var statusText, statusClass;
-    if (!hasStock) {
-      statusText = '품절'; statusClass = 'soldout';
-    } else if (!buyOpen) {
+    if (isBuyDisabled) {
+      statusText = '매입불가'; statusClass = 'no_buy';
+    } else if (!sellOpen) {
       statusText = '준비중'; statusClass = 'soldout';
     } else {
-      statusText = '구매가능'; statusClass = 'available';
+      statusText = '매입가능'; statusClass = 'available';
     }
-    var buyDisabled = (!hasStock || !buyOpen) ? 'disabled' : '';
-    var buyHint = !buyOpen ? '<div class="time-hint">' + getHoursText('판매') + ' 가능</div>' : '';
+    var btnDisabled = (isBuyDisabled || !sellOpen) ? 'disabled' : '';
+    var btnText = isBuyDisabled ? '매입불가' : '매입신청';
+    var sellHint = (!sellOpen && !isBuyDisabled) ? '<div class="time-hint">' + getHoursText('매입') + ' 가능</div>' : '';
 
     return '<div class="price-card">' +
       '<div class="card-header">' +
@@ -743,17 +787,13 @@ function renderServers() {
         '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
       '</div>' +
       '<div class="price-row">' +
-        '<span class="price-label">가격</span>' +
-        '<span class="price-value sell">' + s.sell.toLocaleString() + '원<span class="price-unit">/ ' + game.unit + '</span></span>' +
-      '</div>' +
-      '<div class="price-row">' +
-        '<span class="price-label">재고</span>' +
-        '<span class="price-value" style="color:#ffab40;font-size:16px">' + s.stock.toLocaleString() + '<span class="price-unit"> ' + game.unit + '</span></span>' +
+        '<span class="price-label">매입가</span>' +
+        '<span class="price-value buy">' + s.buy.toLocaleString() + '원<span class="price-unit">/ ' + game.unit + '</span></span>' +
       '</div>' +
       '<div class="card-footer">' +
         '<span class="updated-time">' + s.updated + '</span>' +
         '<div class="card-buttons">' +
-          '<div style="text-align:center"><button class="btn-buy" ' + buyDisabled + ' onclick="openBuyModal(\'' + game.name + '\',\'' + s.name + '\',' + s.sell + ',\'' + game.unit + '\',' + s.stock + ')">구매신청</button>' + buyHint + '</div>' +
+          '<div style="text-align:center"><button class="btn-sell" ' + btnDisabled + ' onclick="openSellModal(\'' + game.name + '\',\'' + s.name + '\',' + s.buy + ',\'' + game.unit + '\')">' + btnText + '</button>' + sellHint + '</div>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -765,7 +805,7 @@ function renderAllPrices() {
   var game = DATA[currentGame];
   if (!game) return;
   document.getElementById('allPricesTitle').textContent = game.name + ' 전체 시세표';
-  var buyOpen = isOperatingHours('판매');
+  var sellOpen = isOperatingHours('매입');
 
   var servers = game.servers.slice();
 
@@ -775,12 +815,11 @@ function renderAllPrices() {
       var va, vb;
       switch (currentSort.col) {
         case 'name': va = a.name; vb = b.name; break;
-        case 'sell': va = a.sell; vb = b.sell; break;
-        case 'stock': va = a.stock; vb = b.stock; break;
+        case 'buy': va = a.buy; vb = b.buy; break;
         case 'unit': va = game.unit; vb = game.unit; break;
         case 'status':
-          va = a.stock > 0 ? 0 : 1;
-          vb = b.stock > 0 ? 0 : 1; break;
+          va = a.buyable ? 0 : 1;
+          vb = b.buyable ? 0 : 1; break;
         case 'updated': va = a.updated; vb = b.updated; break;
         default: va = ''; vb = '';
       }
@@ -804,19 +843,19 @@ function renderAllPrices() {
   var tbody = document.getElementById('allPricesBody');
   var html = '';
   servers.forEach(function(s) {
-    var hasStock = s.stock > 0;
+    var isBuyDisabled = !s.buyable || s.buy === 0;
     var statusText, statusClass;
-    if (!hasStock) {
-      statusText = '품절'; statusClass = 'soldout';
-    } else if (!buyOpen) {
+    if (isBuyDisabled) {
+      statusText = '매입불가'; statusClass = 'no_buy';
+    } else if (!sellOpen) {
       statusText = '준비중'; statusClass = 'soldout';
     } else {
-      statusText = '구매가능'; statusClass = 'available';
+      statusText = '매입가능'; statusClass = 'available';
     }
+    var priceColor = isBuyDisabled ? '#ef5350' : '#c9a96e';
     html += '<tr>' +
       '<td>' + s.name + '</td>' +
-      '<td style="color:#ef5350;font-weight:600">' + s.sell.toLocaleString() + '원</td>' +
-      '<td style="color:#ffab40;font-weight:600">' + s.stock.toLocaleString() + '</td>' +
+      '<td style="color:' + priceColor + ';font-weight:600">' + s.buy.toLocaleString() + '원</td>' +
       '<td style="color:#6688aa">' + game.unit + '</td>' +
       '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
       '<td style="color:#556677;font-size:12px">' + s.updated + '</td>' +
@@ -836,21 +875,27 @@ function sortTable(col) {
   renderAllPrices();
 }
 
-// ===== 구매신청 모달 =====
-function openBuyModal(gameName, serverName, sellPrice, unit, stock) {
-  if (!isOperatingHours('판매')) return;
-  modalPrice = sellPrice;
-  document.getElementById('buyModalGame').value = gameName;
-  document.getElementById('buyModalServer').value = serverName;
-  document.getElementById('buyModalPrice').value = sellPrice.toLocaleString() + '원 / ' + unit;
-  var amountEl = document.getElementById('buyModalAmount');
+// ===== 매입신청 모달 =====
+function openSellModal(gameName, serverName, buyPrice, unit) {
+  if (!isOperatingHours('매입')) {
+    return;
+  }
+  modalPrice = buyPrice;
+  modalUnit = unit;
+  modalGameName = gameName;
+  modalServerName = serverName;
+  document.getElementById('sellModalGame').value = gameName;
+  document.getElementById('sellModalServer').value = serverName;
+  document.getElementById('sellModalPrice').value = buyPrice.toLocaleString() + '원 / ' + unit;
+  var amountEl = document.getElementById('sellModalAmount');
   amountEl.value = '';
-  amountEl.max = stock;
-  amountEl.placeholder = '최대 ' + stock.toLocaleString();
-  document.getElementById('buyEstimateValue').textContent = '0원';
-  document.getElementById('buyModalChar').value = '';
-  document.getElementById('buyModalContact').value = '';
-  document.getElementById('buyModal').classList.add('show');
+  amountEl.placeholder = '예: 5';
+  document.getElementById('sellEstimateValue').textContent = '0원';
+  document.getElementById('sellModalChar').value = '';
+  document.getElementById('sellModalContact').value = '';
+  document.getElementById('sellModalBank').value = '';
+  document.getElementById('sellModalAccount').value = '';
+  document.getElementById('sellModal').classList.add('show');
 }
 
 function closeModal(modalId) {
@@ -870,8 +915,10 @@ function submitForm(type) {
   var char = document.getElementById(prefix + 'Char').value;
   var contact = document.getElementById(prefix + 'Contact').value;
   var amount = document.getElementById(prefix + 'Amount').value;
+  var bank = document.getElementById(prefix + 'Bank').value;
+  var account = document.getElementById(prefix + 'Account').value;
 
-  if (!char || !contact || !amount) {
+  if (!char || !contact || !amount || !bank || !account) {
     alert('모든 항목을 입력해주세요.');
     return;
   }
@@ -880,19 +927,14 @@ function submitForm(type) {
     alert('최소 거래 수량은 ' + minAmount + '입니다.');
     return;
   }
-  // 재고 초과 검증
-  var maxStock = parseInt(document.getElementById('buyModalAmount').max) || 0;
-  if ((parseInt(amount) || 0) > maxStock) {
-    alert('재고(' + maxStock.toLocaleString() + ')를 초과할 수 없습니다.');
+
+  // 운영시간 재확인
+  if (!isOperatingHours('매입')) {
     return;
   }
 
-  // 운영시간 재확인
-  if (!isOperatingHours('판매')) return;
-
   var gameName = document.getElementById(prefix + 'Game').value;
   var serverName = document.getElementById(prefix + 'Server').value;
-  var priceInfo = document.getElementById(prefix + 'Price').value;
   var total = (parseInt(amount) || 0) * modalPrice;
 
   // 현재 게임의 단위 가져오기
@@ -902,7 +944,7 @@ function submitForm(type) {
   // API 전송 payload
   var payload = {
     action: 'submit',
-    type: '구매',
+    type: '판매',
     game_name: gameName,
     server_name: serverName,
     amount: parseInt(amount) || 0,
@@ -911,7 +953,8 @@ function submitForm(type) {
     total_price: total,
     character_name: char,
     contact: contact,
-    bank_account: ''
+    bank_account: bank + ' ' + account,
+    source: 'supply'
   };
 
   closeModal(type + 'Modal');
@@ -928,12 +971,12 @@ function submitForm(type) {
     try {
       var data = JSON.parse(text);
       if (data.success) {
-        showSubmitToast('구매신청이 접수되었습니다.');
+        showSubmitToast('매입신청이 접수되었습니다.');
       } else {
         showSubmitToast('신청 실패: ' + (data.message || '알 수 없는 오류'), true);
       }
     } catch(e) {
-      showSubmitToast('구매신청이 접수되었습니다.');
+      showSubmitToast('매입신청이 접수되었습니다.');
     }
   }).catch(function(err) {
     showSubmitToast('전송 실패: ' + err.message, true);
@@ -948,8 +991,8 @@ function showSubmitToast(message, isError) {
 }
 
 // 모달 바깥 클릭 시 닫기
-document.getElementById('buyModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal('buyModal');
+document.getElementById('sellModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('sellModal');
 });
 
 // 초기화 - API 로드 시도, 실패 시 폴백 데이터 사용
